@@ -1,7 +1,8 @@
 'use client'
 
 import React, { useState, useRef, useCallback } from 'react'
-import { Upload, X, File, Image, FileText, Music, Video, Archive, FileIcon } from 'lucide-react'
+import Image from 'next/image'
+import { Upload, X, File, Image as ImageIcon, FileText, Music, Video, Archive, FileIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 interface FileUploadProps {
@@ -39,7 +40,7 @@ export default function FileUpload({
     const type = file.type.split('/')[0]
     switch (type) {
       case 'image':
-        return <Image className="h-6 w-6 text-blue-500" />
+        return <ImageIcon className="h-6 w-6 text-blue-500" />
       case 'video':
         return <Video className="h-6 w-6 text-purple-500" />
       case 'audio':
@@ -247,9 +248,11 @@ export default function FileUpload({
               >
                 <div className="flex items-center gap-3">
                   {file.preview ? (
-                    <img
+                    <Image
                       src={file.preview}
                       alt={file.name}
+                      width={40}
+                      height={40}
                       className="w-10 h-10 object-cover rounded"
                     />
                   ) : (

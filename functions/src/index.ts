@@ -17,7 +17,6 @@ const app = next({
 const handle = app.getRequestHandler();
 
 export const nextServer = functions
-  .region('europe-west1') // Use different region to avoid storage permission issues
   .https.onRequest(async (req, res) => {
     try {
       await app.prepare();

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react'
+import Image from 'next/image'
 import { Save, X } from 'lucide-react'
 import { ImageUpload } from '@/components/ui/image-upload'
 import { ImageMetadata } from '@/lib/image-utils'
@@ -164,9 +165,11 @@ export default function ProductEditForm({ product }: ProductEditFormProps) {
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                 {formData.images.map((image, index) => (
                   <div key={index} className="relative group">
-                    <img
+                    <Image
                       src={image}
                       alt={`Product ${index + 1}`}
+                      width={200}
+                      height={128}
                       className="w-full h-32 object-cover rounded-lg"
                     />
                     <button

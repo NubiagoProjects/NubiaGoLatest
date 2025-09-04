@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useCallback } from 'react';
+import Image from 'next/image';
 import { Edit, Trash2, RefreshCw, CheckCircle, AlertCircle, X, Image as ImageIcon } from 'lucide-react';
 import { 
   useSupplierImageUpload, 
@@ -135,9 +136,11 @@ export const SupplierImageManager: React.FC<SupplierImageManagerProps> = ({
             {currentImages.map((imageUrl, index) => (
               <div key={index} className="relative group">
                 <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden">
-                  <img
+                  <Image
                     src={imageUrl}
                     alt={`Product ${index + 1}`}
+                    width={200}
+                    height={200}
                     className="w-full h-full object-cover"
                   />
                   

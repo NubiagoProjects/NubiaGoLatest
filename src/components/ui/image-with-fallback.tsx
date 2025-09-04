@@ -31,6 +31,9 @@ function getImagePath(filename: string): string {
   if (filename.startsWith('http')) {
     return filename
   }
+  if (filename.startsWith('/')) {
+    return filename
+  }
   return `/${filename}`
 }
 
@@ -81,7 +84,7 @@ export function ImageWithFallback({
   // Validate and set initial image source
   useEffect(() => {
     if (src) {
-      const validatedSrc = getImagePath(src.split('/').pop() || '')
+      const validatedSrc = src.startsWith('http') ? src : getImagePath(src)
       setImgSrc(validatedSrc)
       setHasError(false)
       setIsLoading(true)

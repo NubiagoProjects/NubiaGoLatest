@@ -11,7 +11,7 @@ import { useAuth } from '@/hooks/useAuth'
 import { useSearchHistoryStore } from '@/store/search-history'
 import { SearchSuggestions } from './search-suggestions'
 import { Product } from '@/types'
-import EnhancedImage from '@/components/mobile/EnhancedImage'
+import Image from 'next/image'
 
 interface ProductSearchProps {
   products: Product[]
@@ -50,7 +50,7 @@ const ProductSearch = React.memo(function ProductSearch({
 
       try {
         const wishlist = await wishlistService.getWishlist(user.uid)
-        const itemIds = new Set(wishlist.items.map(item => item.productId))
+        const itemIds = new Set<string>(wishlist.items.map((item: { productId: string }) => item.productId))
         setWishlistItems(itemIds)
       } catch (error) {
         console.error('Error fetching wishlist items:', error)
@@ -147,39 +147,6 @@ const ProductSearch = React.memo(function ProductSearch({
     <div className="w-full">
       {/* Search and Filter Header */}
       <div className="mb-6">
-        {/* Search Bar */}
-        <div className="relative mb-4">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-          <div className="relative">
-            <Input
-              type="text"
-              placeholder="Search products..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              onFocus={() => setShowSuggestions(true)}
-              onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
-              className="pl-10 pr-4 py-2 w-full"
-            />
-            <SearchSuggestions
-              query={searchQuery}
-              onSelect={(query) => {
-                setSearchQuery(query)
-                addToHistory({
-                  query,
-                  category: selectedCategory !== 'all' ? selectedCategory : undefined,
-                  filters: {
-                    priceRange,
-                    minRating,
-                    sortBy
-                  }
-                })
-              }}
-              onClear={() => setSearchQuery('')}
-              className="max-h-96 overflow-y-auto"
-            />
-          </div>
-        </div>
-
         {/* Filter and Sort Controls */}
         <div className="flex flex-wrap items-center gap-3 mb-4">
           <Button
@@ -296,23 +263,23 @@ const ProductSearch = React.memo(function ProductSearch({
       </div>
 
       {/* Product Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4 lg:gap-6">
         {filteredProducts.map((product) => (
           <Link
             key={product.id}
             href={`/products/${product.id}`}
-            className="bg-white border border-gray-200 rounded-lg hover:border-blue-300 transition-colors cursor-pointer group block"
+            className="bg-white border border-gray-200 rounded-xl hover:border-blue-300 hover:shadow-lg transition-all duration-300 cursor-pointer group block overflow-hidden"
           >
             {/* Product Image */}
-            <div className="relative aspect-square overflow-hidden rounded-t-lg">
-              <EnhancedImage
-                src={product.imageUrl}
+            <div className="relative aspect-square overflow-hidden">
+              <Image
+                src={product.imageUrl || '/fallback-product.jpg'}
                 alt={product.name}
                 width={400}
                 height={400}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                 priority={false}
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
               />
               {product.originalPrice && product.originalPrice > product.price && (
                 <div className="absolute top-2 left-2 bg-red-500 text-white text-xs px-2 py-1 rounded">
@@ -321,17 +288,17 @@ const ProductSearch = React.memo(function ProductSearch({
               )}
               <button
                 onClick={(e) => handleToggleWishlist(e, product)}
-                className="absolute top-2 right-2 p-1.5 bg-white rounded-full shadow-sm hover:bg-gray-50 transition-colors"
+                className="absolute top-2 right-2 p-2 bg-white/90 backdrop-blur-sm rounded-full shadow-md hover:bg-white opacity-0 group-hover:opacity-100 transition-all duration-300"
               >
                 <Heart 
-                  className={`h-3.5 w-3.5 ${wishlistItems.has(product.id) ? 'fill-red-500 text-red-500' : 'text-gray-400'}`} 
+                  className={`h-4 w-4 ${wishlistItems.has(product.id) ? 'fill-red-500 text-red-500' : 'text-gray-600'}`} 
                 />
               </button>
             </div>
 
             {/* Product Info */}
-            <div className="p-3">
-              <h3 className="font-medium text-gray-900 mb-1 line-clamp-2 text-sm">
+            <div className="p-3 flex flex-col h-full">
+              <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 text-sm leading-tight hover:text-blue-600 transition-colors">
                 {product.name}
               </h3>
               
@@ -355,9 +322,9 @@ const ProductSearch = React.memo(function ProductSearch({
               </div>
 
               {/* Price */}
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center space-x-2">
-                  <span className="text-sm font-medium text-gray-900">
+                  <span className="text-lg font-bold text-blue-600">
                     ${product.price.toFixed(2)}
                   </span>
                   {product.originalPrice && product.originalPrice > product.price && (
@@ -366,28 +333,28 @@ const ProductSearch = React.memo(function ProductSearch({
                     </span>
                   )}
                 </div>
-                <div className="flex items-center space-x-1">
-                  <Star className="h-3.5 w-3.5 text-yellow-400 fill-current" />
-                  <span className="text-sm text-gray-600">{product.rating}</span>
-                </div>
               </div>
               
-              <div className="flex items-center justify-between mt-2">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center space-x-1">
+                  <Star className="h-3 w-3 text-yellow-400 fill-current" />
+                  <span className="text-xs text-gray-600">{product.rating}</span>
+                  <span className="text-xs text-gray-400">({product.reviewCount})</span>
+                </div>
                 <span className="text-xs text-gray-500">
-                  {product.stock > 0 ? `${product.stock} in stock` : 'Out of stock'}
+                  {product.stock > 0 ? `${product.stock} left` : 'Out of stock'}
                 </span>
-                <span className="text-xs text-gray-500">{product.reviewCount} reviews</span>
               </div>
 
               {/* Action Buttons */}
-              <div className="flex gap-2">
+              <div className="mt-auto">
                 <Button
                   onClick={(e) => handleAddToCart(e, product)}
                   disabled={product.stock <= 0}
-                  className="flex-1"
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white"
                   size="sm"
                 >
-                  <ShoppingCart className="h-3.5 w-3.5 mr-1" />
+                  <ShoppingCart className="h-4 w-4 mr-1" />
                   {product.stock > 0 ? 'Add to Cart' : 'Out of Stock'}
                 </Button>
               </div>

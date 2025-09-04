@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { ArrowLeft, Package, Truck, CheckCircle, Clock, AlertCircle, Loader2 } from 'lucide-react'
 import { useLogistics } from '@/hooks/useLogistics'
 import { toast } from '@/lib/utils'
@@ -160,9 +161,11 @@ export default function OrderDetailPage({ params }: { params: { id: string } }) 
                 {order.items.map((item) => (
                   <div key={item.id} className="px-6 py-4">
                     <div className="flex items-center">
-                      <img
+                      <Image
                         src={item.image}
                         alt={item.name}
+                        width={64}
+                        height={64}
                         className="h-16 w-16 rounded-lg object-cover"
                       />
                       <div className="ml-4 flex-1">

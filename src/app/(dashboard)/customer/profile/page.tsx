@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react'
+import Image from 'next/image'
 import { ArrowLeft, Camera, Save, User, Mail, Phone, MapPin, AlertCircle } from 'lucide-react'
 import { ImageUpload } from '@/components/ui/image-upload'
 import { ImageMetadata } from '@/lib/image-utils'
@@ -168,9 +169,11 @@ export default function CustomerProfilePage() {
               <h3 className="text-lg font-medium text-gray-900 mb-4">Profile Picture</h3>
               <div className="flex items-center space-x-6">
                 <div className="relative">
-                  <img
+                  <Image
                     src={profile.avatar}
                     alt={profile.name}
+                    width={96}
+                    height={96}
                     className="w-24 h-24 rounded-full object-cover border-4 border-gray-200"
                   />
                   <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-primary-600 rounded-full flex items-center justify-center">

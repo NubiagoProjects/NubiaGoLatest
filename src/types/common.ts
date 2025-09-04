@@ -36,6 +36,7 @@ export interface ApiError extends AppError {
 
 export interface User {
   id: string
+  uid: string
   email: string
   name?: string
   role: 'customer' | 'supplier' | 'admin'
@@ -76,12 +77,15 @@ export interface Product {
   name: string
   description: string
   price: number
+  originalPrice?: number
   currency: string
   category: string
   images: string[]
+  imageUrl: string
   tags: string[]
   specifications: Record<string, string>
   inventory: number
+  stock: number
   supplierId: string
   rating: number
   reviewCount: number

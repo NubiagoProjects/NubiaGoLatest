@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState, useRef, useEffect } from 'react'
+import Image from 'next/image'
 import { Send, Paperclip, Smile, MoreVertical, Phone, Video, Search, User, Settings } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/form'
@@ -135,9 +136,11 @@ export default function ChatInterface({
             {otherParticipants.slice(0, 3).map((participant, index) => (
               <div key={participant.id} className="relative">
                 {participant.avatar ? (
-                  <img
+                  <Image
                     src={participant.avatar}
                     alt={participant.name}
+                    width={32}
+                    height={32}
                     className="w-8 h-8 rounded-full border-2 border-white"
                   />
                 ) : (
@@ -224,9 +227,11 @@ export default function ChatInterface({
               {!message.isOwn && (
                 <div className="flex-shrink-0">
                   {message.senderAvatar ? (
-                    <img
+                    <Image
                       src={message.senderAvatar}
                       alt={message.senderName}
+                      width={32}
+                      height={32}
                       className="w-8 h-8 rounded-full"
                     />
                   ) : (
@@ -253,9 +258,11 @@ export default function ChatInterface({
                     : 'bg-gray-100 text-gray-900'
                 }`}>
                   {message.type === 'image' ? (
-                    <img
+                    <Image
                       src={message.content}
                       alt="Message image"
+                      width={300}
+                      height={200}
                       className="max-w-full rounded"
                     />
                   ) : message.type === 'file' ? (

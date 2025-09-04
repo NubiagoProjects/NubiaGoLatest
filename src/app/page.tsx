@@ -14,10 +14,30 @@ import {
   Search,
   Star,
   Users,
-  Globe
+  Globe,
+  ShoppingCart,
+  Truck,
+  Shield,
+  Headphones,
+  ArrowRight,
+  ChevronLeft,
+  ChevronRight,
+  Eye,
+  Plus,
+  Minus,
+  X,
+  Filter,
+  SortAsc,
+  Grid,
+  List,
+  MapPin,
+  Clock,
+  TrendingUp,
+  Award,
+  Zap,
+  Smartphone
 } from 'lucide-react'
 import PullToRefresh from '@/components/mobile/PullToRefresh'
-import MobileHomepage from '@/components/mobile/MobileHomepage'
 import { useEffect, useState } from 'react'
 import TestConnection from './test-connection'
 
@@ -27,99 +47,88 @@ import TestConnection from './test-connection'
 
 function HeroSection() {
   return (
-    <section className="bg-primary-600 text-white">
-      <div className="w-full px-4 sm:px-6 lg:px-8 py-20">
-        <div className="grid lg:grid-cols-3 gap-12 items-start">
-          {/* Categories Sidebar */}
-          <div className="bg-white rounded-2xl p-8 shadow-elevated">
-            <h3 className="text-xl font-semibold text-neutral-900 mb-8">Browse Categories</h3>
-            <div className="space-y-4">
-              <Link href="/products?category=Electronics" className="flex items-center space-x-4 p-4 rounded-xl bg-neutral-50 border border-neutral-200 cursor-pointer">
-                <div className="w-10 h-10 bg-primary-100 rounded-xl flex items-center justify-center">
-                  <Laptop className="h-5 w-5 text-primary-600" />
-                </div>
-                <span className="text-neutral-700 font-medium">Electronics</span>
-              </Link>
-              <Link href="/products?category=Fashion" className="flex items-center space-x-4 p-4 rounded-xl bg-neutral-50 border border-neutral-200 cursor-pointer">
-                <div className="w-10 h-10 bg-yellow-100 rounded-xl flex items-center justify-center">
-                  <Shirt className="h-5 w-5 text-yellow-600" />
-                </div>
-                <span className="text-neutral-700 font-medium">Fashion</span>
-              </Link>
-              <Link href="/products?category=Home & Living" className="flex items-center space-x-4 p-4 rounded-xl bg-neutral-50 border border-neutral-200 cursor-pointer">
-                <div className="w-10 h-10 bg-neutral-100 rounded-xl flex items-center justify-center">
-                  <Home className="h-5 w-5 text-neutral-600" />
-                </div>
-                <span className="text-neutral-700 font-medium">Home & Living</span>
-              </Link>
-              <Link href="/products?category=Health & Beauty" className="flex items-center space-x-4 p-4 rounded-xl bg-neutral-50 border border-neutral-200 cursor-pointer">
-                <div className="w-10 h-10 bg-yellow-100 rounded-xl flex items-center justify-center">
-                  <HealthIcon className="h-5 w-5 text-yellow-600" />
-                </div>
-                <span className="text-neutral-700 font-medium">Health & Beauty</span>
-              </Link>
-              <Link href="/products?category=Sports" className="flex items-center space-x-4 p-4 rounded-xl bg-neutral-50 border border-neutral-200 cursor-pointer">
-                <div className="w-10 h-10 bg-primary-100 rounded-xl flex items-center justify-center">
-                  <Dumbbell className="h-5 w-5 text-primary-600" />
-                </div>
-                <span className="text-neutral-700 font-medium">Sports</span>
-              </Link>
-              <Link href="/products?category=Books" className="flex items-center space-x-4 p-4 rounded-xl bg-neutral-50 border border-neutral-200 cursor-pointer">
-                <div className="w-10 h-10 bg-neutral-100 rounded-xl flex items-center justify-center">
-                  <BookOpen className="h-5 w-5 text-neutral-600" />
-                </div>
-                <span className="text-neutral-700 font-medium">Books</span>
-              </Link>
+    <section className="bg-gradient-to-br from-primary-600 via-primary-700 to-primary-800 text-white overflow-hidden">
+      <div className="w-full px-4 sm:px-6 lg:px-8 py-10">
+        <div className="grid lg:grid-cols-2 gap-8 items-center">
+          {/* Section 1: Fashion Apparel Image */}
+          <div className="relative">
+            <div className="relative aspect-[16/9] lg:aspect-[3/2] rounded-2xl overflow-hidden shadow-xl">
+              <Image
+                src="/hero-fashion.jpg"
+                alt="Fashion hero image showcasing stylish clothing and accessories"
+                fill
+                className="object-cover"
+                priority
+                sizes="(max-width: 768px) 100vw, 50vw"
+              />
             </div>
           </div>
 
-          {/* Hero Content */}
-          <div className="lg:col-span-2">
-            <div className="flex flex-wrap gap-3 mb-8">
-              <span className="bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full text-sm font-medium">
+          {/* Section 2: Search Bar and Content */}
+          <div className="space-y-4">
+            <div className="flex flex-wrap gap-2 mb-4">
+              <span className="bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-medium">
                 Global 34+ Countries in Africa
               </span>
-              <span className="bg-yellow-500/20 backdrop-blur-sm px-4 py-2 rounded-full text-sm font-medium text-yellow-800">
+              <span className="bg-yellow-500/20 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-medium text-yellow-200">
                 Star Best Quality Products
               </span>
             </div>
 
-            <h1 className="text-5xl lg:text-6xl font-bold mb-6 leading-tight">
+            <h2 className="text-2xl lg:text-3xl font-bold mb-3 leading-tight">
               Find what you need, 
               <span className="text-yellow-400">faster!</span>
-            </h1>
+            </h2>
 
-            <p className="text-xl text-white/90 mb-8 max-w-2xl">
+            <p className="text-lg text-white/90 mb-4 max-w-xl">
               Shop everyday essentials from trusted sellers across Africa — simple, quick, and reliable.
             </p>
 
             {/* Search Bar */}
-            <div className="relative max-w-2xl mb-8">
+            <div className="relative max-w-xl mb-4">
               <input type="text" 
                      placeholder="e.g., smartphone, lipstick, washing machine..." 
-                     className="w-full px-6 py-4 pr-16 rounded-full text-neutral-900 placeholder-neutral-500 focus:outline-none focus:ring-4 focus:ring-white/20" />
-              <button className="absolute right-2 top-2 bg-primary-600 text-white p-2 rounded-full">
-                <Search className="h-5 w-5" />
+                     className="w-full px-4 py-3 pr-12 rounded-full text-neutral-900 placeholder-neutral-500 focus:outline-none focus:ring-4 focus:ring-white/20 shadow-lg" />
+              <button className="absolute right-1 top-1 bg-primary-600 hover:bg-primary-700 text-white p-2 rounded-full transition-colors">
+                <Search className="h-4 w-4" />
               </button>
             </div>
 
             {/* Stats */}
-            <div className="flex flex-wrap gap-8">
+            <div className="flex flex-wrap gap-4">
               <div className="text-center">
-                <div className="text-2xl font-bold text-yellow-400">10M+</div>
-                <div className="text-white/80 text-sm">Happy Customers</div>
+                <div className="text-xl font-bold text-yellow-400">10M+</div>
+                <div className="text-white/80 text-xs">Happy Customers</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-yellow-400">500K+</div>
-                <div className="text-white/80 text-sm">Products</div>
+                <div className="text-xl font-bold text-yellow-400">500K+</div>
+                <div className="text-white/80 text-xs">Products</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-yellow-400">34+</div>
-                <div className="text-white/80 text-sm">Countries</div>
+                <div className="text-xl font-bold text-yellow-400">34+</div>
+                <div className="text-white/80 text-xs">Countries</div>
               </div>
+            </div>
+
+            {/* CTA Buttons */}
+            <div className="flex flex-col sm:flex-row gap-3 pt-3">
+              <Link href="/products" className="inline-flex items-center justify-center px-6 py-3 bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-bold rounded-full transition-all duration-300 transform hover:scale-105 shadow-lg">
+                Start Shopping
+                <Search className="h-4 w-4 ml-2" />
+              </Link>
+              <Link href="/products?category=Fashion" className="inline-flex items-center justify-center px-6 py-3 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white font-semibold rounded-full border border-white/20 transition-all duration-300">
+                Explore Fashion
+                <Shirt className="h-4 w-4 ml-2" />
+              </Link>
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Background Decorative Elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-yellow-400/10 rounded-full blur-3xl"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-white/5 rounded-full blur-3xl"></div>
       </div>
     </section>
   )
@@ -456,7 +465,7 @@ function FashionCollectionSection() {
             <div className="relative rounded-3xl overflow-hidden shadow-[0_20px_60px_rgb(0,0,0,0.15)] hover:shadow-[0_30px_80px_rgb(0,0,0,0.25)] transition-all duration-500 hover:-translate-y-2">
               <Link href="/products?category=Fashion">
                 <Image
-                  src="/ui-hero-banner.jpg"
+                  src="/hero-cosmetics-banner.jpg"
                   alt="Fashion Collection Showcase"
                   width={700}
                   height={500}
@@ -914,16 +923,8 @@ export default function HomePage() {
         <TestConnection />
       </div>
 
-      {/* Mobile homepage - only visible on mobile devices */}
-      <div className="md:hidden">
-        <MobileHomepage 
-          onSearch={handleSearch}
-          onCategorySelect={handleCategorySelect}
-        />
-      </div>
-
-      {/* Desktop homepage - only visible on desktop devices */}
-      <div className="hidden md:block">
+      {/* Homepage - responsive design */}
+      <div>
         <PullToRefresh onRefresh={() => Promise.resolve(window.location.reload())}>
           <HeroSection />
           <NewArrivalsSection />

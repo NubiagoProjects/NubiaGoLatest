@@ -1,7 +1,8 @@
 'use client'
 
 import React, { useState } from 'react'
-import { Heart, Trash2, ShoppingCart, Eye, Share2, Move } from 'lucide-react'
+import { Heart, X, ShoppingCart, Star } from 'lucide-react'
+import { ThumbnailImage } from '@/components/ui/enhanced-image'
 import { Button } from '@/components/ui/button'
 
 interface WishlistItem {
@@ -197,10 +198,10 @@ export default function Wishlist({
 
               {/* Product Image */}
               <div className="flex-shrink-0">
-                <img
+                <ThumbnailImage
                   src={item.image}
                   alt={item.name}
-                  className="w-20 h-20 object-cover rounded-lg"
+                  className="w-20 h-20"
                 />
               </div>
 

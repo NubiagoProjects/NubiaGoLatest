@@ -45,16 +45,17 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   }
 
   return (
-    <div className={`bg-white rounded-2xl border border-neutral-200 shadow-soft overflow-hidden ${className}`}>
+    <div className={`bg-white rounded-2xl border border-neutral-200 shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group ${className}`}>
       {/* Image Container */}
-      <div className="relative aspect-[4/5] overflow-hidden">
+      <div className="relative aspect-square overflow-hidden">
         <Link href={`/products/${id}`}>
           <Image
             src={image}
             alt={name}
             width={400}
-            height={500}
-            className="w-full h-full object-cover"
+            height={400}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            priority={false}
           />
         </Link>
         
@@ -71,28 +72,28 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         )}
         
         {/* Quick Actions */}
-        <div className="absolute top-3 right-3 flex flex-col gap-2">
+        <div className="absolute top-3 right-3 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
           <button
             onClick={handleWishlistToggle}
-            className="w-8 h-8 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-medium"
+            className="w-10 h-10 bg-white/95 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg hover:bg-white transition-colors"
           >
             <Heart 
-              className={`h-4 w-4 ${isWishlisted ? 'text-red-500 fill-current' : 'text-neutral-700'}`} 
+              className={`h-5 w-5 ${isWishlisted ? 'text-red-500 fill-current' : 'text-neutral-600'}`} 
             />
           </button>
         </div>
       </div>
       
       {/* Product Info */}
-      <div className="p-4">
+      <div className="p-4 flex flex-col h-full">
         {/* Category */}
         {category && (
-          <div className="text-xs text-neutral-500 mb-2">{category}</div>
+          <div className="text-xs text-neutral-500 mb-2 uppercase tracking-wide">{category}</div>
         )}
         
         {/* Product Name */}
-        <Link href={`/products/${id}`} className="block">
-          <h3 className="text-sm font-semibold text-neutral-900 line-clamp-2 leading-tight mb-3">
+        <Link href={`/products/${id}`} className="block flex-grow">
+          <h3 className="text-sm font-semibold text-neutral-900 line-clamp-2 leading-tight mb-3 hover:text-primary-600 transition-colors">
             {name}
           </h3>
         </Link>
@@ -125,7 +126,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           onClick={handleAddToCart}
           variant="primary"
           size="sm"
-          className="w-full"
+          className="w-full mt-auto hover:bg-primary-700 transition-colors"
           leftIcon={<ShoppingCart className="h-4 w-4" />}
         >
           Add to Cart

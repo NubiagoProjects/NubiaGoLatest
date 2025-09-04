@@ -3,10 +3,10 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { 
-  Plus, Package, Search, Filter, Edit, Eye, Trash2, 
-  MoreHorizontal, ArrowLeft, TrendingUp, TrendingDown,
+  Plus, Package, Search, Filter, Grid, List, Edit, Trash2, Eye, MoreHorizontal, ArrowLeft, TrendingUp, TrendingDown,
   CheckCircle, Clock, XCircle, AlertTriangle, ChevronDown
 } from 'lucide-react'
+import Image from 'next/image'
 import Link from 'next/link'
 
 interface SupplierProduct {
@@ -303,9 +303,11 @@ export default function SupplierProductsPage() {
           {filteredProducts.map((product) => (
             <div key={product.id} className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
               <div className="aspect-w-16 aspect-h-9 bg-gray-200">
-                <img
+                <Image
                   src={product.image}
                   alt={product.name}
+                  width={400}
+                  height={192}
                   className="w-full h-48 object-cover"
                 />
               </div>
