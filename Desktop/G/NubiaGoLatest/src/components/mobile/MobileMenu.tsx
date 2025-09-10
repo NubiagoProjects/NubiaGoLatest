@@ -5,7 +5,7 @@ import { useAuth } from '@/hooks/useAuth'
 import { useRouter } from 'next/navigation'
 import { X, User, ShoppingCart, Heart, Settings, LogOut, Home, Grid3X3, Search, Bell, HelpCircle, Shield, FileText, Star, Gift, Truck, CreditCard, ShoppingBag } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { useCartStore } from '@/hooks/useCartStore'
+import { useCartStore } from '@/store/cart'
 import { wishlistService } from '@/lib/services/wishlist.service'
 import { navigateUniversally, getEventHandlingStrategy } from '@/lib/mobile-detection'
 

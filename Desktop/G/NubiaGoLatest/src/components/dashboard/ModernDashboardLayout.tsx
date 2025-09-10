@@ -141,34 +141,33 @@ export default function ModernDashboardLayout({
         mobileMenuOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
       )}>
         <div className={cn("h-full flex flex-col", colors.sidebar)}>
-          {/* Welcome Section */}
-          <div className="px-4 sm:px-6 py-6 border-b border-slate-800">
-            <div className="flex items-center justify-between mb-4">
-              <button
-                onClick={toggleSidebar}
-                className="hidden lg:flex p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
-              >
-                {sidebarCollapsed ? <ChevronRight className="h-5 w-5" /> : <ChevronLeft className="h-5 w-5" />}
-              </button>
-              <button
-                onClick={toggleMobileMenu}
-                className="lg:hidden p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
-              >
-                <X className="h-6 w-6" />
-              </button>
-            </div>
-            {(!sidebarCollapsed || (typeof window !== 'undefined' && window.innerWidth < 1024)) && (
-              <div className="text-center">
-                <h2 className="text-white font-bold text-lg mb-2">Welcome back, {user.name}!</h2>
-                <p className="text-slate-400 text-sm leading-relaxed">
-                  Track your orders, manage your account, and discover amazing products.
-                </p>
+          {/* Dashboard Header */}
+          <div className="px-4 sm:px-6 py-4 border-b border-slate-800">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                {(!sidebarCollapsed || (typeof window !== 'undefined' && window.innerWidth < 1024)) && (
+                  <h1 className="text-white font-bold text-xl">Dashboard</h1>
+                )}
               </div>
-            )}
+              <div className="flex items-center space-x-2">
+                <button
+                  onClick={toggleSidebar}
+                  className="hidden lg:flex p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+                >
+                  {sidebarCollapsed ? <ChevronRight className="h-5 w-5" /> : <ChevronLeft className="h-5 w-5" />}
+                </button>
+                <button
+                  onClick={toggleMobileMenu}
+                  className="lg:hidden p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+                >
+                  <X className="h-6 w-6" />
+                </button>
+              </div>
+            </div>
           </div>
 
           {/* Navigation */}
-          <nav className="flex-1 px-3 sm:px-4 py-6 space-y-2 overflow-y-auto">
+          <nav className="flex-1 px-3 sm:px-4 py-3 space-y-1 overflow-y-auto">
             {sidebarItems.map((item) => {
               const isActive = activeTab === item.id
               const Icon = item.icon
@@ -178,21 +177,21 @@ export default function ModernDashboardLayout({
                   key={item.id}
                   onClick={() => handleNavigation(item)}
                   className={cn(
-                    "w-full flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200",
-                    // Enhanced touch targets for mobile (minimum 44px height)
-                    "min-h-[44px]",
+                    "w-full flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-200",
+                    // Optimized height for better space usage
+                    "min-h-[40px]",
                     isActive
                       ? cn(colors.sidebarActive, "shadow-lg scale-[1.02]")
                       : cn(colors.sidebarText, colors.sidebarHover, "hover:scale-[1.01]")
                   )}
                 >
-                  <Icon className="h-6 w-6 flex-shrink-0" />
+                  <Icon className="h-5 w-5 flex-shrink-0" />
                   {(!sidebarCollapsed || (typeof window !== 'undefined' && window.innerWidth < 1024)) && (
                     <>
-                      <span className="ml-4 truncate font-medium">{item.label}</span>
+                      <span className="ml-3 truncate font-medium">{item.label}</span>
                       {item.badge && (
                         <span className={cn(
-                          "ml-auto px-2.5 py-1 text-xs font-semibold rounded-full",
+                          "ml-auto px-2 py-0.5 text-xs font-semibold rounded-full",
                           colors.primary,
                           "text-white shadow-sm"
                         )}>
@@ -206,30 +205,6 @@ export default function ModernDashboardLayout({
             })}
           </nav>
 
-          {/* User Profile */}
-          <div className="p-4 border-t border-slate-800">
-            {(!sidebarCollapsed || window.innerWidth < 1024) ? (
-              <div className="flex items-center space-x-4 p-3 rounded-xl hover:bg-slate-800 cursor-pointer transition-colors min-h-[60px]">
-                <div className={cn("w-12 h-12 rounded-xl flex items-center justify-center shadow-lg", colors.primary)}>
-                  <User className="h-6 w-6 text-white" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-white truncate">{user.name}</p>
-                  <p className="text-xs text-slate-400 truncate">{user.role}</p>
-                  <div className="flex items-center mt-1">
-                    <div className="w-2 h-2 bg-green-400 rounded-full mr-2"></div>
-                    <span className="text-xs text-slate-400">Online</span>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <div className="flex justify-center">
-                <div className={cn("w-12 h-12 rounded-xl flex items-center justify-center shadow-lg", colors.primary)}>
-                  <User className="h-6 w-6 text-white" />
-                </div>
-              </div>
-            )}
-          </div>
         </div>
       </div>
 

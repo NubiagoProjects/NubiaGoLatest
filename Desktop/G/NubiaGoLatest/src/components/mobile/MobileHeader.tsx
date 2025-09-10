@@ -6,9 +6,10 @@ import { Search, ShoppingCart, Menu, User, Heart, Bell } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { useRouter } from 'next/navigation'
 import { CartService } from '@/lib/services/cart.service'
-import { WishlistService } from '@/lib/services/wishlist.service'
+import { wishlistService } from '@/lib/services/wishlist.service'
 import { navigateUniversally } from '@/lib/mobile-detection'
 import { Logo } from '@/components/ui/Logo'
+import { useCartStore } from '@/store/cart'
 import MobileSearch from './MobileSearch'
 
 interface MobileHeaderProps {
@@ -33,8 +34,8 @@ export default function MobileHeader({ onMenuToggle, onSearch }: MobileHeaderPro
     const fetchWishlistCount = async () => {
       try {
         if (user?.uid) {
-          const wishlist = await wishlistService.getWishlist(user.uid)
-          setWishlistItemCount(wishlist.items.length)
+          const count = await wishlistService.getWishlistCount(user.uid)
+          setWishlistItemCount(count)
         }
       } catch (error) {
         console.error('Error fetching wishlist count:', error)

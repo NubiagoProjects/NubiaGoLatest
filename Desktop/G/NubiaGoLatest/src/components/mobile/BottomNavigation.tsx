@@ -6,7 +6,7 @@ import { useAuth } from '@/hooks/useAuth'
 import { useEffect, useState, useCallback } from 'react'
 import { navigateUniversally, getEventHandlingStrategy } from '@/lib/mobile-detection'
 import { cn } from '@/lib/utils'
-import { useCartStore } from '@/hooks/useCartStore'
+import { useCartStore } from '@/store/cart'
 import { wishlistService } from '@/lib/services/wishlist.service'
 
 export default function BottomNavigation() {
