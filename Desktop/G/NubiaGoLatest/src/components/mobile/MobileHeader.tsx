@@ -5,10 +5,10 @@ import Link from 'next/link'
 import { Search, ShoppingCart, Menu, User, Heart, Bell } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { useRouter } from 'next/navigation'
-import { cn } from '@/lib/utils'
-import { useCartStore } from '@/hooks/useCartStore'
-import { wishlistService } from '@/lib/services/wishlist.service'
-import { navigateUniversally, getEventHandlingStrategy } from '@/lib/mobile-detection'
+import { CartService } from '@/lib/services/cart.service'
+import { WishlistService } from '@/lib/services/wishlist.service'
+import { navigateUniversally } from '@/lib/mobile-detection'
+import { Logo } from '@/components/ui/Logo'
 import MobileSearch from './MobileSearch'
 
 interface MobileHeaderProps {
@@ -79,21 +79,7 @@ export default function MobileHeader({ onMenuToggle, onSearch }: MobileHeaderPro
               touchAction: 'manipulation'
             }}
           >
-            <div className="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center overflow-hidden shadow-sm">
-              <svg
-                viewBox="0 0 512 512"
-                className="w-5 h-5"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <g fill="white">
-                  <path d="M256 128 C256 128, 238 128, 238 146 L238 302 C238 320, 256 320, 256 320 C256 320, 274 320, 274 302 L274 146 C274 128, 256 128, 256 128 Z" />
-                  <path d="M180 160 C180 160, 162 160, 162 178 L162 270 C162 288, 180 288, 180 288 C180 288, 198 288, 198 270 L198 178 C198 160, 180 160, 180 160 Z" />
-                  <path d="M332 160 C332 160, 314 160, 314 178 L314 270 C314 288, 332 288, 332 288 C332 288, 350 288, 350 270 L350 178 C350 160, 332 160, 332 160 Z" />
-                  <path d="M104 192 C104 192, 86 192, 86 210 L86 238 C86 256, 104 256, 104 256 C104 256, 122 256, 122 238 L122 210 C122 192, 104 192, 104 192 Z" />
-                  <path d="M408 192 C408 192, 390 192, 390 210 L390 238 C390 256, 408 256, 408 256 C408 256, 426 256, 426 238 L426 210 C426 192, 408 192, 408 192 Z" />
-                </g>
-              </svg>
-            </div>
+            <Logo size="sm" />
             <span className="text-xl font-bold text-gray-900">NubiaGo</span>
           </Link>
 
