@@ -92,12 +92,7 @@ export default function BottomNavigation() {
 
 
   const handleNavigation = useCallback((e: React.MouseEvent | React.TouchEvent, href: string, id: string) => {
-    const eventStrategy = getEventHandlingStrategy()
-    
-    // Only prevent defaults if the device strategy requires it
-    if (eventStrategy.preventDefaults) {
-      e.preventDefault()
-    }
+    // Don't prevent default - allow normal navigation
     e.stopPropagation()
     
     // Universal navigation handling

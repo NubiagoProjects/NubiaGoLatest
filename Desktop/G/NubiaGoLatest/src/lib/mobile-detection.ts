@@ -206,11 +206,12 @@ export class UniversalDeviceDetector {
     // Primary: Screen size check with flexible threshold
     if (screenWidth <= this.breakpoints.mobile) return true
     
-    // Secondary: Touch-only devices (no hover, coarse pointer)
-    if (capabilities.touch && !capabilities.hover && capabilities.pointer === 'coarse') return true
+    // Secondary: iOS/iPhone detection (critical for iOS Safari)
+    if (/iPhone|iPod/i.test(userAgent)) return true
     
-    // Tertiary: User agent fallback for edge cases
-    if (/Mobile|Android|iPhone|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent)) return true
+    // Tertiary: Touch-only devices (no hover, coarse pointer) OR mobile user agents
+    if (capabilities.touch && !capabilities.hover && capabilities.pointer === 'coarse') return true
+    if (/Mobile|Android|BlackBerry|IEMobile|Opera Mini/i.test(userAgent)) return true
     
     // Quaternary: Orientation support on small screens (likely mobile)
     if (screenWidth <= 900 && capabilities.orientation) return true
