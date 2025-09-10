@@ -1,0 +1,250 @@
+/* Safari iOS Compatibility Fixes */
+
+/* ============================================================================
+   BACKDROP-BLUR FALLBACKS FOR SAFARI
+   ============================================================================ */
+
+/* Mobile Bottom Navigation - Safari fallback */
+.mobile-bottom-navigation {
+  /* Fallback for Safari < iOS 15 */
+  background: rgba(255, 255, 255, 0.95);
+  
+  /* Modern browsers with backdrop-filter support */
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  
+  /* Enhanced fallback using supports query */
+  @supports not (backdrop-filter: blur(10px)) {
+    background: rgba(255, 255, 255, 0.98);
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+  }
+}
+
+/* Mobile Header - Safari fallback */
+.mobile-header {
+  /* Fallback for Safari < iOS 15 */
+  background: rgba(255, 255, 255, 0.95);
+  
+  /* Modern browsers with backdrop-filter support */
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  
+  @supports not (backdrop-filter: blur(10px)) {
+    background: rgba(255, 255, 255, 0.98);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+}
+
+/* Mobile Menu Overlay - Safari fallback */
+.mobile-menu-container {
+  /* Fallback for Safari < iOS 15 */
+  background: rgba(0, 0, 0, 0.6);
+  
+  /* Modern browsers with backdrop-filter support */
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  
+  @supports not (backdrop-filter: blur(4px)) {
+    background: rgba(0, 0, 0, 0.75);
+  }
+}
+
+/* Glass effect components - Safari fallback */
+.glass-effect {
+  /* Fallback for Safari < iOS 15 */
+  background: rgba(255, 255, 255, 0.9);
+  
+  /* Modern browsers with backdrop-filter support */
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  
+  @supports not (backdrop-filter: blur(8px)) {
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+}
+
+/* ============================================================================
+   VIEWPORT HEIGHT FIXES FOR SAFARI iOS
+   ============================================================================ */
+
+/* Fix for Safari iOS viewport height issues */
+.min-h-screen-safe {
+  min-height: 100vh;
+  /* iOS 15.4+ dynamic viewport units */
+  min-height: 100dvh;
+  /* Fallback for older iOS */
+  min-height: -webkit-fill-available;
+}
+
+.h-screen-safe {
+  height: 100vh;
+  /* iOS 15.4+ dynamic viewport units */
+  height: 100dvh;
+  /* Fallback for older iOS */
+  height: -webkit-fill-available;
+}
+
+/* ============================================================================
+   FLEXBOX GAP FALLBACKS FOR OLDER SAFARI
+   ============================================================================ */
+
+/* Gap fallbacks using margin for Safari < 14.1 */
+@supports not (gap: 1rem) {
+  .gap-1-fallback > * + * { margin-left: 0.25rem; }
+  .gap-2-fallback > * + * { margin-left: 0.5rem; }
+  .gap-3-fallback > * + * { margin-left: 0.75rem; }
+  .gap-4-fallback > * + * { margin-left: 1rem; }
+  .gap-6-fallback > * + * { margin-left: 1.5rem; }
+  .gap-8-fallback > * + * { margin-left: 2rem; }
+  
+  /* Vertical gap fallbacks */
+  .gap-y-1-fallback > * + * { margin-top: 0.25rem; }
+  .gap-y-2-fallback > * + * { margin-top: 0.5rem; }
+  .gap-y-3-fallback > * + * { margin-top: 0.75rem; }
+  .gap-y-4-fallback > * + * { margin-top: 1rem; }
+  .gap-y-6-fallback > * + * { margin-top: 1.5rem; }
+  .gap-y-8-fallback > * + * { margin-top: 2rem; }
+}
+
+/* ============================================================================
+   SAFE AREA INSETS FOR IPHONE NOTCH/DYNAMIC ISLAND
+   ============================================================================ */
+
+/* Enhanced iOS Safe Area Support with CSS Variables */
+:root {
+  --safe-area-inset-top: env(safe-area-inset-top, 0px);
+  --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-area-inset-left: env(safe-area-inset-left, 0px);
+  --safe-area-inset-right: env(safe-area-inset-right, 0px);
+  
+  /* Dynamic viewport height for iOS */
+  --vh: 1vh;
+  --dynamic-vh: calc(var(--vh, 1vh) * 100);
+}
+
+.safe-area-top {
+  padding-top: var(--safe-area-inset-top);
+}
+
+.safe-area-bottom {
+  padding-bottom: var(--safe-area-inset-bottom);
+}
+
+.safe-area-left {
+  padding-left: var(--safe-area-inset-left);
+}
+
+.safe-area-right {
+  padding-right: var(--safe-area-inset-right);
+}
+
+.safe-area-inset {
+  padding-top: var(--safe-area-inset-top);
+  padding-bottom: var(--safe-area-inset-bottom);
+  padding-left: var(--safe-area-inset-left);
+  padding-right: var(--safe-area-inset-right);
+}
+
+/* iOS-specific height utilities */
+.h-screen-ios {
+  height: 100vh;
+  height: var(--dynamic-vh);
+  height: -webkit-fill-available;
+}
+
+.min-h-screen-ios {
+  min-height: 100vh;
+  min-height: var(--dynamic-vh);
+  min-height: -webkit-fill-available;
+}
+
+.max-h-screen-ios {
+  max-height: 100vh;
+  max-height: var(--dynamic-vh);
+  max-height: -webkit-fill-available;
+}
+
+/* ============================================================================
+   WEBKIT SPECIFIC FIXES
+   ============================================================================ */
+
+/* Fix for iOS Safari scroll bounce */
+.no-scroll-bounce {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: none;
+}
+
+/* Fix for iOS Safari input zoom */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="search"],
+textarea,
+select {
+  font-size: 16px !important;
+  -webkit-appearance: none;
+  appearance: none;
+  border-radius: 0;
+}
+
+/* Fix for iOS Safari button styling */
+button,
+input[type="button"],
+input[type="submit"] {
+  -webkit-appearance: none;
+  appearance: none;
+  border-radius: 0;
+}
+
+/* ============================================================================
+   PERFORMANCE OPTIMIZATIONS FOR SAFARI
+   ============================================================================ */
+
+/* Hardware acceleration for smooth animations */
+.hardware-accelerated {
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  -webkit-perspective: 1000;
+  perspective: 1000;
+}
+
+/* Optimize scrolling performance */
+.smooth-scroll {
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}
+
+/* ============================================================================
+   TOUCH ACTION FIXES FOR SAFARI
+   ============================================================================ */
+
+/* Fix touch actions for better mobile interaction */
+.touch-pan-y {
+  touch-action: pan-y;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.touch-manipulation {
+  touch-action: manipulation;
+  -webkit-touch-callout: none;
+}
+
+/* ============================================================================
+   WEBKIT MASK AND CLIP-PATH FIXES
+   ============================================================================ */
+
+/* Ensure webkit prefixes for mask and clip-path */
+.webkit-mask-fix {
+  -webkit-mask-image: inherit;
+  mask-image: inherit;
+}
+
+.webkit-clip-path-fix {
+  -webkit-clip-path: inherit;
+  clip-path: inherit;
+}

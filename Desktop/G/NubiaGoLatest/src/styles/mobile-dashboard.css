@@ -1,0 +1,229 @@
+/* Mobile Dashboard Optimizations */
+
+/* Responsive Typography Scale */
+.mobile-text-xs { @apply text-xs sm:text-sm; }
+.mobile-text-sm { @apply text-sm sm:text-base; }
+.mobile-text-base { @apply text-base sm:text-lg; }
+.mobile-text-lg { @apply text-lg sm:text-xl; }
+.mobile-text-xl { @apply text-xl sm:text-2xl; }
+.mobile-text-2xl { @apply text-2xl sm:text-3xl; }
+.mobile-text-3xl { @apply text-3xl sm:text-4xl; }
+
+/* Responsive Spacing */
+.mobile-p-xs { @apply p-2 sm:p-3; }
+.mobile-p-sm { @apply p-3 sm:p-4; }
+.mobile-p-md { @apply p-4 sm:p-6; }
+.mobile-p-lg { @apply p-6 sm:p-8; }
+.mobile-p-xl { @apply p-8 sm:p-12; }
+
+.mobile-m-xs { @apply m-2 sm:m-3; }
+.mobile-m-sm { @apply m-3 sm:m-4; }
+.mobile-m-md { @apply m-4 sm:m-6; }
+.mobile-m-lg { @apply m-6 sm:m-8; }
+.mobile-m-xl { @apply m-8 sm:m-12; }
+
+.mobile-gap-xs { @apply gap-2 sm:gap-3; }
+.mobile-gap-sm { @apply gap-3 sm:gap-4; }
+.mobile-gap-md { @apply gap-4 sm:gap-6; }
+.mobile-gap-lg { @apply gap-6 sm:gap-8; }
+.mobile-gap-xl { @apply gap-8 sm:gap-12; }
+
+/* Touch Target Optimization */
+.touch-target {
+  min-height: 44px;
+  min-width: 44px;
+  touch-action: manipulation;
+}
+
+.touch-target-lg {
+  min-height: 48px;
+  min-width: 48px;
+  touch-action: manipulation;
+}
+
+.touch-target-xl {
+  min-height: 52px;
+  min-width: 52px;
+  touch-action: manipulation;
+}
+
+/* Mobile-First Button Styles */
+.mobile-btn {
+  @apply inline-flex items-center justify-center font-medium rounded-lg transition-all duration-200;
+  @apply touch-target focus:outline-none focus:ring-2 focus:ring-offset-2;
+  @apply disabled:opacity-50 disabled:cursor-not-allowed;
+  @apply px-4 py-3 text-base;
+}
+
+.mobile-btn-sm {
+  @apply px-3 py-2 text-sm;
+  min-height: 44px;
+  min-width: 44px;
+}
+
+.mobile-btn-lg {
+  @apply px-6 py-4 text-lg;
+  min-height: 52px;
+  min-width: 52px;
+}
+
+/* Mobile Card Optimizations */
+.mobile-card {
+  @apply bg-white rounded-xl border border-gray-200 transition-all duration-200;
+  @apply mobile-p-md;
+}
+
+.mobile-card-interactive {
+  @apply mobile-card hover:shadow-lg hover:scale-[1.02];
+  @apply focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2;
+  @apply touch-target text-left;
+}
+
+/* Mobile Input Optimizations */
+.mobile-input {
+  @apply w-full px-4 py-3 text-base border border-gray-300 rounded-lg;
+  @apply focus:ring-2 focus:ring-blue-500 focus:border-transparent;
+  @apply disabled:bg-gray-100 disabled:cursor-not-allowed;
+  @apply touch-target;
+  min-height: 44px;
+}
+
+.mobile-select {
+  @apply mobile-input appearance-none bg-white;
+}
+
+/* Mobile Table Alternatives */
+.mobile-data-card {
+  @apply mobile-card mb-4;
+}
+
+.mobile-data-card-header {
+  @apply flex items-center justify-between mb-3;
+}
+
+.mobile-data-card-content {
+  @apply space-y-2;
+}
+
+.mobile-data-row {
+  @apply flex justify-between items-start;
+}
+
+.mobile-data-label {
+  @apply text-xs font-medium text-gray-500 uppercase tracking-wider;
+}
+
+.mobile-data-value {
+  @apply text-sm text-gray-900 text-right max-w-[60%];
+}
+
+/* Mobile Navigation Optimizations */
+.mobile-nav-item {
+  @apply flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200;
+  @apply touch-target;
+}
+
+.mobile-nav-item-active {
+  @apply mobile-nav-item bg-blue-50 text-blue-700 border-blue-200 shadow-sm;
+}
+
+.mobile-nav-item-inactive {
+  @apply mobile-nav-item text-gray-600 hover:bg-gray-50 hover:text-gray-900;
+}
+
+/* Mobile Modal Optimizations */
+.mobile-modal {
+  @apply fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50;
+  @apply p-4;
+}
+
+.mobile-modal-content {
+  @apply bg-white rounded-xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto;
+  @apply mobile-p-md;
+}
+
+.mobile-modal-header {
+  @apply flex items-center justify-between mb-4;
+}
+
+.mobile-modal-title {
+  @apply mobile-text-lg font-semibold text-gray-900;
+}
+
+.mobile-modal-close {
+  @apply text-gray-400 hover:text-gray-600 transition-colors;
+  @apply touch-target;
+}
+
+/* Mobile Grid Optimizations */
+.mobile-grid-1 { @apply grid grid-cols-1; }
+.mobile-grid-2 { @apply grid grid-cols-1 sm:grid-cols-2; }
+.mobile-grid-3 { @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3; }
+.mobile-grid-4 { @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4; }
+
+/* Mobile Flexbox Optimizations */
+.mobile-flex-col { @apply flex flex-col sm:flex-row; }
+.mobile-flex-col-reverse { @apply flex flex-col-reverse sm:flex-row; }
+
+/* Mobile Spacing Between Elements */
+.mobile-space-y { @apply space-y-3 sm:space-y-4; }
+.mobile-space-x { @apply space-x-3 sm:space-x-4; }
+
+/* Mobile Text Alignment */
+.mobile-text-center { @apply text-center sm:text-left; }
+.mobile-text-left { @apply text-left; }
+
+/* Mobile Visibility */
+.mobile-hidden { @apply hidden sm:block; }
+.mobile-only { @apply block sm:hidden; }
+
+/* Mobile Safe Areas (for iOS devices with notches) */
+.mobile-safe-top { padding-top: env(safe-area-inset-top); }
+.mobile-safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
+.mobile-safe-left { padding-left: env(safe-area-inset-left); }
+.mobile-safe-right { padding-right: env(safe-area-inset-right); }
+
+/* Mobile Scroll Optimizations */
+.mobile-scroll {
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}
+
+/* Mobile Focus Styles */
+.mobile-focus {
+  @apply focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2;
+}
+
+/* Mobile Hover States (only on devices that support hover) */
+@media (hover: hover) {
+  .mobile-hover\:bg-gray-50:hover {
+    @apply bg-gray-50;
+  }
+  
+  .mobile-hover\:bg-blue-50:hover {
+    @apply bg-blue-50;
+  }
+  
+  .mobile-hover\:shadow-lg:hover {
+    @apply shadow-lg;
+  }
+  
+  .mobile-hover\:scale-105:hover {
+    transform: scale(1.05);
+  }
+}
+
+/* Mobile Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+  .mobile-dark\:bg-gray-800 {
+    @apply bg-gray-800;
+  }
+  
+  .mobile-dark\:text-white {
+    @apply text-white;
+  }
+  
+  .mobile-dark\:border-gray-700 {
+    @apply border-gray-700;
+  }
+}

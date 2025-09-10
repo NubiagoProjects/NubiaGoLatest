@@ -1,0 +1,30 @@
+Firebase Authorized Domains Setup Instructions:
+
+CURRENT PRODUCTION URL: https://nubia-go-latest-a7kire4qg-help-6423s-projects.vercel.app
+
+To fix the auth/unauthorized-domain error, add these domains to Firebase Authentication:
+
+1. Go to Firebase Console: https://console.firebase.google.com/
+2. Select project: concrete-setup-468208-v0
+3. Navigate to Authentication > Settings > Authorized domains
+4. Add these domains:
+
+REQUIRED DOMAINS TO ADD:
+- nubia-go-latest-a7kire4qg-help-6423s-projects.vercel.app
+- help-6423s-projects.vercel.app (wildcard pattern)
+- *.vercel.app (to cover all future deployments)
+
+CURRENT AUTHORIZED DOMAINS (should already be there):
+- localhost (for development)
+- concrete-setup-468208-v0.firebaseapp.com (default)
+
+STEPS:
+1. Click "Add domain" button
+2. Enter: nubia-go-latest-a7kire4qg-help-6423s-projects.vercel.app
+3. Click "Add domain" again  
+4. Enter: *.help-6423s-projects.vercel.app
+5. Click "Add domain" again
+6. Enter: *.vercel.app
+7. Save changes
+
+This will authorize all current and future Vercel deployments for Firebase Authentication.
