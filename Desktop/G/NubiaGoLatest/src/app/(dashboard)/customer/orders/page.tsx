@@ -3,10 +3,13 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { 
-  Package, Eye, Filter, Search, Calendar, DollarSign,
-  Truck, CheckCircle, Clock, XCircle, ArrowLeft
+  Package, Eye, Truck, Download, MoreVertical
 } from 'lucide-react'
 import Link from 'next/link'
+import ModernSubpageLayout from '@/components/dashboard/ModernSubpageLayout'
+import DataTable from '@/components/dashboard/DataTable'
+import StatusBadge from '@/components/dashboard/StatusBadge'
+import FilterBar from '@/components/dashboard/FilterBar'
 
 interface Order {
   id: string
@@ -26,8 +29,8 @@ export default function CustomerOrdersPage() {
   const router = useRouter()
   const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
-  const [filter, setFilter] = useState('all')
   const [searchTerm, setSearchTerm] = useState('')
+  const [activeFilters, setActiveFilters] = useState<Record<string, string>>({})
 
   useEffect(() => {
     // Simulate loading orders
@@ -64,175 +67,174 @@ export default function CustomerOrdersPage() {
           total: 99.98,
           createdAt: '2024-01-22',
           estimatedDelivery: '2024-01-27'
+        },
+        {
+          id: 'ORD-004',
+          status: 'pending',
+          items: [
+            { name: 'Phone Case', quantity: 1, price: 24.99 }
+          ],
+          total: 24.99,
+          createdAt: '2024-01-25',
+          estimatedDelivery: '2024-01-30'
+        },
+        {
+          id: 'ORD-005',
+          status: 'cancelled',
+          items: [
+            { name: 'Bluetooth Speaker', quantity: 1, price: 79.99 }
+          ],
+          total: 79.99,
+          createdAt: '2024-01-18',
         }
       ])
       setLoading(false)
     }, 1000)
   }, [])
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'delivered': return 'text-green-600 bg-green-100'
-      case 'shipped': return 'text-blue-600 bg-blue-100'
-      case 'processing': return 'text-yellow-600 bg-yellow-100'
-      case 'pending': return 'text-gray-600 bg-gray-100'
-      case 'cancelled': return 'text-red-600 bg-red-100'
-      default: return 'text-gray-600 bg-gray-100'
+  const filterOptions = [
+    {
+      key: 'status',
+      label: 'Status',
+      options: [
+        { value: 'pending', label: 'Pending' },
+        { value: 'confirmed', label: 'Confirmed' },
+        { value: 'processing', label: 'Processing' },
+        { value: 'shipped', label: 'Shipped' },
+        { value: 'delivered', label: 'Delivered' },
+        { value: 'cancelled', label: 'Cancelled' }
+      ]
     }
-  }
-
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'delivered': return <CheckCircle className="h-4 w-4" />
-      case 'shipped': return <Truck className="h-4 w-4" />
-      case 'processing': return <Clock className="h-4 w-4" />
-      case 'cancelled': return <XCircle className="h-4 w-4" />
-      default: return <Clock className="h-4 w-4" />
-    }
-  }
+  ]
 
   const filteredOrders = orders.filter(order => {
-    const matchesFilter = filter === 'all' || order.status === filter
-    const matchesSearch = order.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         order.items.some(item => item.name.toLowerCase().includes(searchTerm.toLowerCase()))
-    return matchesFilter && matchesSearch
+    const matchesSearch = searchTerm === '' || 
+      order.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      order.items.some(item => item.name.toLowerCase().includes(searchTerm.toLowerCase()))
+    
+    const matchesStatus = !activeFilters.status || order.status === activeFilters.status
+    
+    return matchesSearch && matchesStatus
   })
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary-600"></div>
-      </div>
-    )
+  const columns = [
+    {
+      key: 'id',
+      label: 'Order ID',
+      sortable: true,
+      render: (value: string) => (
+        <div className="font-medium text-gray-900">#{value}</div>
+      )
+    },
+    {
+      key: 'items',
+      label: 'Items',
+      render: (items: any[], row: Order) => (
+        <div>
+          <div className="text-sm text-gray-900">
+            {items.map(item => item.name).join(', ')}
+          </div>
+          <div className="text-xs text-gray-500">
+            {items.length} item{items.length !== 1 ? 's' : ''}
+          </div>
+        </div>
+      )
+    },
+    {
+      key: 'status',
+      label: 'Status',
+      sortable: true,
+      render: (status: string) => <StatusBadge status={status} />
+    },
+    {
+      key: 'total',
+      label: 'Total',
+      sortable: true,
+      render: (value: number) => (
+        <div className="font-medium text-gray-900">${value.toFixed(2)}</div>
+      )
+    },
+    {
+      key: 'createdAt',
+      label: 'Order Date',
+      sortable: true,
+      render: (value: string) => (
+        <div className="text-sm text-gray-900">
+          {new Date(value).toLocaleDateString()}
+        </div>
+      )
+    },
+    {
+      key: 'trackingNumber',
+      label: 'Tracking',
+      render: (value: string, row: Order) => (
+        value ? (
+          <div className="text-sm text-gray-900 font-mono">{value}</div>
+        ) : (
+          <span className="text-gray-400">-</span>
+        )
+      )
+    }
+  ]
+
+  const actions = [
+    {
+      key: 'view',
+      label: 'View Details',
+      icon: Eye,
+      onClick: (order: Order) => router.push(`/customer/orders/${order.id}`)
+    },
+    {
+      key: 'track',
+      label: 'Track Order',
+      icon: Truck,
+      onClick: (order: Order) => router.push(`/customer/orders/${order.id}/tracking`)
+    }
+  ]
+
+  const handleExport = () => {
+    console.log('Exporting orders...')
   }
 
+  const emptyState = (
+    <div className="text-center py-12">
+      <Package className="mx-auto h-12 w-12 text-gray-400" />
+      <h3 className="mt-2 text-sm font-medium text-gray-900">No orders found</h3>
+      <p className="mt-1 text-sm text-gray-500">
+        {searchTerm || Object.values(activeFilters).some(Boolean)
+          ? 'Try adjusting your search or filter criteria.'
+          : 'Start shopping to see your orders here.'
+        }
+      </p>
+      {!searchTerm && !Object.values(activeFilters).some(Boolean) && (
+        <div className="mt-6">
+          <Link
+            href="/products"
+            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700"
+          >
+            Start Shopping
+          </Link>
+        </div>
+      )}
+    </div>
+  )
+
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="w-full px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center space-x-4">
-            <Link href="/customer" className="text-gray-400 hover:text-gray-500">
-              <ArrowLeft className="h-5 w-5" />
-            </Link>
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">My Orders</h1>
-              <p className="text-gray-600">Track and manage your orders</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Filters and Search */}
-        <div className="bg-white rounded-lg shadow p-6 mb-6">
-          <div className="flex flex-col lg:flex-row gap-4">
-            {/* Search */}
-            <div className="flex-1">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-                <input
-                  type="text"
-                  placeholder="Search orders..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                />
-              </div>
-            </div>
-
-            {/* Status Filter */}
-            <div className="lg:w-48">
-              <select
-                value={filter}
-                onChange={(e) => setFilter(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-              >
-                <option value="all">All Orders</option>
-                <option value="pending">Pending</option>
-                <option value="processing">Processing</option>
-                <option value="shipped">Shipped</option>
-                <option value="delivered">Delivered</option>
-                <option value="cancelled">Cancelled</option>
-              </select>
-            </div>
-          </div>
-        </div>
-
-        {/* Orders List */}
-        <div className="bg-white rounded-lg shadow">
-          {filteredOrders.length === 0 ? (
-            <div className="p-8 text-center">
-              <Package className="mx-auto h-12 w-12 text-gray-400" />
-              <h3 className="mt-2 text-sm font-medium text-gray-900">No orders found</h3>
-              <p className="mt-1 text-sm text-gray-500">
-                {searchTerm || filter !== 'all' 
-                  ? 'Try adjusting your search or filter criteria.'
-                  : 'Start shopping to see your orders here.'
-                }
-              </p>
-              {!searchTerm && filter === 'all' && (
-                <div className="mt-6">
-                  <Link
-                    href="/products"
-                    className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700"
-                  >
-                    Start Shopping
-                  </Link>
-                </div>
-              )}
-            </div>
-          ) : (
-            <div className="divide-y divide-gray-200">
-              {filteredOrders.map((order) => (
-                <div key={order.id} className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-4">
-                      <div className="flex-shrink-0">
-                        <div className="w-12 h-12 bg-gray-200 rounded-lg flex items-center justify-center">
-                          <Package className="h-6 w-6 text-gray-400" />
-                        </div>
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium text-gray-900">Order #{order.id}</p>
-                        <p className="text-sm text-gray-500">
-                          {order.items.length} item{order.items.length !== 1 ? 's' : ''} • 
-                          Placed on {order.createdAt}
-                        </p>
-                        <p className="text-sm text-gray-500">
-                          {order.items.map(item => item.name).join(', ')}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-center space-x-4">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(order.status)}`}>
-                        {getStatusIcon(order.status)}
-                        <span className="ml-1">{order.status}</span>
-                      </span>
-                      <p className="text-sm font-medium text-gray-900">${order.total.toFixed(2)}</p>
-                      <div className="flex items-center space-x-2">
-                        <Link
-                          href={`/order/track/${order.id}`}
-                          className="text-primary-600 hover:text-primary-500"
-                        >
-                          <Truck className="h-4 w-4" />
-                        </Link>
-                        <Link
-                          href={`/order/confirmation/${order.id}`}
-                          className="text-primary-600 hover:text-primary-500"
-                        >
-                          <Eye className="h-4 w-4" />
-                        </Link>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Order Stats */}
-        <div className="mt-8 grid grid-cols-1 md:grid-cols-4 gap-6">
-          <div className="bg-white rounded-lg shadow p-6">
+    <ModernSubpageLayout
+      title="Orders"
+      subtitle="Track and manage your orders"
+      backUrl="/customer"
+      showExportButton
+      onExportClick={handleExport}
+      breadcrumbs={[
+        { label: 'Dashboard', href: '/customer' },
+        { label: 'Orders' }
+      ]}
+    >
+      <div className="space-y-6">
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <div className="flex items-center">
               <Package className="h-8 w-8 text-primary-600" />
               <div className="ml-4">
@@ -241,7 +243,7 @@ export default function CustomerOrdersPage() {
               </div>
             </div>
           </div>
-          <div className="bg-white rounded-lg shadow p-6">
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <div className="flex items-center">
               <Truck className="h-8 w-8 text-blue-600" />
               <div className="ml-4">
@@ -252,9 +254,9 @@ export default function CustomerOrdersPage() {
               </div>
             </div>
           </div>
-          <div className="bg-white rounded-lg shadow p-6">
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <div className="flex items-center">
-              <CheckCircle className="h-8 w-8 text-green-600" />
+              <Package className="h-8 w-8 text-green-600" />
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-500">Delivered</p>
                 <p className="text-2xl font-semibold text-gray-900">
@@ -263,9 +265,11 @@ export default function CustomerOrdersPage() {
               </div>
             </div>
           </div>
-          <div className="bg-white rounded-lg shadow p-6">
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <div className="flex items-center">
-              <DollarSign className="h-8 w-8 text-purple-600" />
+              <div className="h-8 w-8 bg-purple-100 rounded-lg flex items-center justify-center">
+                <span className="text-purple-600 font-semibold">$</span>
+              </div>
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-500">Total Spent</p>
                 <p className="text-2xl font-semibold text-gray-900">
@@ -275,7 +279,28 @@ export default function CustomerOrdersPage() {
             </div>
           </div>
         </div>
+
+        {/* Filter Bar */}
+        <FilterBar
+          searchPlaceholder="Search orders by ID or item name..."
+          searchValue={searchTerm}
+          onSearchChange={setSearchTerm}
+          filters={filterOptions}
+          activeFilters={activeFilters}
+          onFilterChange={(key, value) => setActiveFilters(prev => ({ ...prev, [key]: value }))}
+          onClearFilters={() => setActiveFilters({})}
+          showDateRange
+        />
+
+        {/* Orders Table */}
+        <DataTable
+          columns={columns}
+          data={filteredOrders}
+          actions={actions}
+          loading={loading}
+          emptyState={emptyState}
+        />
       </div>
-    </div>
+    </ModernSubpageLayout>
   )
 } 

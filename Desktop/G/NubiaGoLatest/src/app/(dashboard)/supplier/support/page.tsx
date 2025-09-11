@@ -1,7 +1,10 @@
 'use client'
 
 import { useState } from 'react'
-import ModernDashboardLayout from '@/components/dashboard/ModernDashboardLayout'
+import ModernSubpageLayout from '@/components/dashboard/ModernSubpageLayout'
+import FilterBar from '@/components/dashboard/FilterBar'
+import StatusBadge from '@/components/dashboard/StatusBadge'
+import DataTable from '@/components/dashboard/DataTable'
 import { 
   MessageSquare, 
   Phone,
@@ -14,35 +17,18 @@ import {
   Plus,
   Send,
   Paperclip,
-  Grid3X3,
-  Package,
-  ShoppingBag,
-  BarChart3,
-  TrendingUp,
-  Truck,
-  Users,
-  CreditCard,
-  Settings
+  Eye,
+  Edit
 } from 'lucide-react'
 
 export default function SupplierSupportPage() {
   const [activeTab, setActiveTab] = useState('tickets')
   const [searchTerm, setSearchTerm] = useState('')
-  const [filterStatus, setFilterStatus] = useState('all')
+  const [activeFilters, setActiveFilters] = useState<Record<string, string>>({
+    status: 'all',
+    priority: 'all'
+  })
   const [showNewTicket, setShowNewTicket] = useState(false)
-
-  const sidebarItems = [
-    { id: 'overview', icon: Grid3X3, label: 'Dashboard', path: '/supplier' },
-    { id: 'products', icon: Package, label: 'Products', path: '/supplier/products' },
-    { id: 'orders', icon: ShoppingBag, label: 'Orders', path: '/supplier/orders' },
-    { id: 'inventory', icon: BarChart3, label: 'Inventory', path: '/supplier/inventory' },
-    { id: 'shipping', icon: Truck, label: 'Shipping', path: '/supplier/shipping' },
-    { id: 'analytics', icon: TrendingUp, label: 'Analytics', path: '/supplier/analytics' },
-    { id: 'customers', icon: Users, label: 'Customers', path: '/supplier/customers' },
-    { id: 'payments', icon: CreditCard, label: 'Payments', path: '/supplier/payments' },
-    { id: 'support', icon: MessageSquare, label: 'Support', path: '/supplier/support' },
-    { id: 'settings', icon: Settings, label: 'Settings', path: '/supplier/settings' }
-  ]
 
   const supportTickets = [
     {
@@ -116,38 +102,155 @@ export default function SupplierSupportPage() {
     }
   }
 
+  const handleFilterChange = (filterKey: string, value: string) => {
+    setActiveFilters(prev => ({
+      ...prev,
+      [filterKey]: value
+    }))
+  }
+
+  const handleExport = () => {
+    console.log('Exporting support tickets...')
+    // TODO: Implement export functionality
+  }
+
+  const handleNewTicket = () => {
+    setShowNewTicket(true)
+  }
+
   const filteredTickets = supportTickets.filter(ticket => {
     const matchesSearch = ticket.subject.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          ticket.id.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesFilter = filterStatus === 'all' || ticket.status === filterStatus
-    return matchesSearch && matchesFilter
+    const matchesStatus = activeFilters.status === 'all' || ticket.status === activeFilters.status
+    const matchesPriority = activeFilters.priority === 'all' || ticket.priority === activeFilters.priority
+    return matchesSearch && matchesStatus && matchesPriority
   })
 
   const openTickets = supportTickets.filter(t => t.status === 'open').length
   const inProgressTickets = supportTickets.filter(t => t.status === 'in_progress').length
   const resolvedTickets = supportTickets.filter(t => t.status === 'resolved').length
 
+  const breadcrumbs = [
+    { label: 'Dashboard', href: '/supplier' },
+    { label: 'Support', href: '/supplier/support' }
+  ]
+
+  const filters = [
+    {
+      key: 'status',
+      label: 'Status',
+      options: [
+        { value: 'all', label: 'All Status' },
+        { value: 'open', label: 'Open' },
+        { value: 'in_progress', label: 'In Progress' },
+        { value: 'waiting', label: 'Waiting' },
+        { value: 'resolved', label: 'Resolved' }
+      ]
+    },
+    {
+      key: 'priority',
+      label: 'Priority',
+      options: [
+        { value: 'all', label: 'All Priority' },
+        { value: 'high', label: 'High' },
+        { value: 'medium', label: 'Medium' },
+        { value: 'low', label: 'Low' }
+      ]
+    }
+  ]
+
+  const columns = [
+    {
+      key: 'id',
+      label: 'Ticket ID',
+      render: (ticket: any) => (
+        <div className="font-medium text-blue-600">{ticket.id}</div>
+      )
+    },
+    {
+      key: 'subject',
+      label: 'Subject',
+      render: (ticket: any) => (
+        <div className="font-medium text-gray-900">{ticket.subject}</div>
+      )
+    },
+    {
+      key: 'category',
+      label: 'Category',
+      render: (ticket: any) => (
+        <div className="text-gray-600 capitalize">{ticket.category}</div>
+      )
+    },
+    {
+      key: 'status',
+      label: 'Status',
+      render: (ticket: any) => (
+        <StatusBadge status={ticket.status} />
+      )
+    },
+    {
+      key: 'priority',
+      label: 'Priority',
+      render: (ticket: any) => (
+        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+          ticket.priority === 'high' ? 'bg-red-100 text-red-800' :
+          ticket.priority === 'medium' ? 'bg-yellow-100 text-yellow-800' :
+          'bg-green-100 text-green-800'
+        }`}>
+          {ticket.priority}
+        </span>
+      )
+    },
+    {
+      key: 'created',
+      label: 'Created',
+      render: (ticket: any) => (
+        <div className="text-gray-600">{ticket.created}</div>
+      )
+    },
+    {
+      key: 'messages',
+      label: 'Messages',
+      render: (ticket: any) => (
+        <div className="text-gray-900">{ticket.messages}</div>
+      )
+    }
+  ]
+
+  const actions = [
+    {
+      key: 'view',
+      label: 'View',
+      icon: Eye,
+      onClick: (ticket: any) => {
+        console.log('Viewing ticket:', ticket.id)
+        // TODO: Navigate to ticket details
+      }
+    },
+    {
+      key: 'edit',
+      label: 'Edit',
+      icon: Edit,
+      onClick: (ticket: any) => {
+        console.log('Editing ticket:', ticket.id)
+        // TODO: Open edit modal
+      },
+      show: (ticket: any) => ticket.status !== 'resolved'
+    }
+  ]
+
   return (
-    <ModernDashboardLayout 
-      sidebarItems={sidebarItems}
+    <ModernSubpageLayout
       title="Support Center"
       subtitle="Get help and manage support tickets"
+      breadcrumbs={breadcrumbs}
+      showAddButton
+      addButtonText="New Ticket"
+      onAddClick={handleNewTicket}
+      showExportButton
+      onExportClick={handleExport}
     >
       <div className="space-y-6">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">Support Center</h1>
-            <p className="text-gray-600">Get help and track your support requests</p>
-          </div>
-          <button
-            onClick={() => setShowNewTicket(true)}
-            className="inline-flex items-center px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors"
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            New Ticket
-          </button>
-        </div>
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -207,7 +310,7 @@ export default function SupplierSupportPage() {
               onClick={() => setActiveTab('tickets')}
               className={`py-2 px-1 border-b-2 font-medium text-sm ${
                 activeTab === 'tickets'
-                  ? 'border-orange-500 text-orange-600'
+                  ? 'border-blue-500 text-blue-600'
                   : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
               }`}
             >
@@ -217,7 +320,7 @@ export default function SupplierSupportPage() {
               onClick={() => setActiveTab('contact')}
               className={`py-2 px-1 border-b-2 font-medium text-sm ${
                 activeTab === 'contact'
-                  ? 'border-orange-500 text-orange-600'
+                  ? 'border-blue-500 text-blue-600'
                   : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
               }`}
             >
@@ -227,7 +330,7 @@ export default function SupplierSupportPage() {
               onClick={() => setActiveTab('faq')}
               className={`py-2 px-1 border-b-2 font-medium text-sm ${
                 activeTab === 'faq'
-                  ? 'border-orange-500 text-orange-600'
+                  ? 'border-blue-500 text-blue-600'
                   : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
               }`}
             >
@@ -239,102 +342,27 @@ export default function SupplierSupportPage() {
         {/* Tab Content */}
         {activeTab === 'tickets' && (
           <div className="space-y-6">
-            {/* Filters */}
-            <div className="bg-white rounded-lg p-6 border border-gray-200">
-              <div className="flex flex-col sm:flex-row gap-4">
-                <div className="flex-1">
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                    <input
-                      type="text"
-                      placeholder="Search tickets..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                    />
-                  </div>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <Filter className="h-4 w-4 text-gray-400" />
-                  <select
-                    value={filterStatus}
-                    onChange={(e) => setFilterStatus(e.target.value)}
-                    className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                  >
-                    <option value="all">All Status</option>
-                    <option value="open">Open</option>
-                    <option value="in_progress">In Progress</option>
-                    <option value="waiting">Waiting</option>
-                    <option value="resolved">Resolved</option>
-                  </select>
-                </div>
-              </div>
-            </div>
+            <FilterBar
+              searchValue={searchTerm}
+              onSearchChange={setSearchTerm}
+              filters={filters}
+              activeFilters={activeFilters}
+              onFilterChange={handleFilterChange}
+            />
 
-            {/* Tickets List */}
-            <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-              <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Ticket ID
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Subject
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Category
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Status
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Priority
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Created
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Messages
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {filteredTickets.map((ticket) => (
-                      <tr key={ticket.id} className="hover:bg-gray-50 cursor-pointer">
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm font-medium text-blue-600">{ticket.id}</div>
-                        </td>
-                        <td className="px-6 py-4">
-                          <div className="text-sm font-medium text-gray-900">{ticket.subject}</div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-600 capitalize">{ticket.category}</div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(ticket.status)}`}>
-                            {getStatusIcon(ticket.status)}
-                            <span className="ml-1 capitalize">{ticket.status.replace('_', ' ')}</span>
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getPriorityColor(ticket.priority)}`}>
-                            {ticket.priority}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-600">{ticket.created}</div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">{ticket.messages}</div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+            <DataTable
+              data={filteredTickets}
+              columns={columns}
+              actions={actions}
+              loading={false}
+            />
+
+            {filteredTickets.length === 0 && (
+              <div className="text-center py-8">
+                <MessageSquare className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                <p className="text-gray-500">No support tickets found</p>
               </div>
-            </div>
+            )}
           </div>
         )}
 
@@ -406,7 +434,7 @@ export default function SupplierSupportPage() {
                   </label>
                   <input
                     type="text"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     placeholder="Brief description of your issue"
                   />
                 </div>
@@ -440,7 +468,7 @@ export default function SupplierSupportPage() {
                   </label>
                   <textarea
                     rows={4}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     placeholder="Please provide detailed information about your issue"
                   ></textarea>
                 </div>
@@ -454,7 +482,7 @@ export default function SupplierSupportPage() {
                   </button>
                   <button
                     type="submit"
-                    className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors"
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                   >
                     Create Ticket
                   </button>
@@ -464,6 +492,6 @@ export default function SupplierSupportPage() {
           </div>
         )}
       </div>
-    </ModernDashboardLayout>
+    </ModernSubpageLayout>
   )
 }

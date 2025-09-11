@@ -12,6 +12,7 @@ import { useSearchHistoryStore } from '@/store/search-history'
 import { SearchSuggestions } from './search-suggestions'
 import { Product } from '@/types'
 import Image from 'next/image'
+import { useToast } from '@/components/ui/toast'
 
 interface ProductSearchProps {
   products: Product[]
@@ -37,6 +38,7 @@ const ProductSearch = React.memo(function ProductSearch({
   
   // Initialize services and auth
   const { user } = useAuth()
+  const { success, error } = useToast()
   const cartService = new CartService()
   const wishlistService = new WishlistService()
 
@@ -98,16 +100,16 @@ const ProductSearch = React.memo(function ProductSearch({
     e.stopPropagation()
     
     if (!user?.uid) {
-      alert('Please sign in to add items to cart')
+      error('Please sign in to add items to cart')
       return
     }
     
     try {
       await cartService.addToCart(user.uid, product.id, 1)
-      alert(`${product.name} has been added to your cart`)
+      success(`${product.name} has been added to your cart`)
     } catch (error: any) {
       console.error('Error adding to cart:', error)
-      alert('Failed to add item to cart')
+      error('Failed to add item to cart')
     }
   }, [user?.uid, cartService])
 
@@ -115,7 +117,7 @@ const ProductSearch = React.memo(function ProductSearch({
     e.stopPropagation()
     
     if (!user?.uid) {
-      alert('Please sign in to manage wishlist')
+      error('Please sign in to manage wishlist')
       return
     }
     
@@ -129,17 +131,17 @@ const ProductSearch = React.memo(function ProductSearch({
           newSet.delete(product.id)
           return newSet
         })
-        alert(`${product.name} has been removed from your wishlist`)
+        success(`${product.name} has been removed from your wishlist`)
       } else {
         await wishlistService.addToWishlist(user.uid, product.id)
         setWishlistItems(prev => new Set([...prev, product.id]))
-        alert(`${product.name} has been added to your wishlist`)
+        success(`${product.name} has been added to your wishlist`)
       }
       
       onToggleWishlist?.(product)
     } catch (error: any) {
       console.error('Error toggling wishlist:', error)
-      alert('Failed to update wishlist')
+      error('Failed to update wishlist')
     }
   }, [user?.uid, wishlistItems, wishlistService, onToggleWishlist])
 

@@ -130,7 +130,7 @@ export default function CustomerDashboard() {
         const order = orders.find((o: any) => o.id === orderId)
         if (order) {
           // In a real app, you'd add items to cart via a service
-          alert(`Reordering ${order.items.length} items from order ${orderId}`)
+          // In a real app, use a toast notification instead of alert
           router.push('/cart')
         }
         break

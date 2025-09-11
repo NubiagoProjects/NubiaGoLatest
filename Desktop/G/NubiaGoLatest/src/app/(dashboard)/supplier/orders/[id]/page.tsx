@@ -230,6 +230,7 @@ export default function SupplierOrderDetailPage({ params }: { params: { id: stri
     if (order) {
       setOrder({ ...order, status: newStatus as any })
       // In real app, make API call to update status
+      // TODO: Replace with toast notification
       console.log(`Updating order ${order.id} status to ${newStatus}`)
     }
   }

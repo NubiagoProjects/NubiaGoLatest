@@ -40,7 +40,7 @@ export default function UserEditForm({ user }: UserEditFormProps) {
     await new Promise(resolve => setTimeout(resolve, 1000))
     
     setSaving(false)
-    alert('User updated successfully!')
+    console.log('User updated successfully!')
     router.push(`/admin/users/${user.id}`)
   }
 

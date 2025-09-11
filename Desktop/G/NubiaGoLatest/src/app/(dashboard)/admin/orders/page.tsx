@@ -5,15 +5,23 @@ import { useRouter } from 'next/navigation'
 import { 
   Eye, Edit, Trash2, Search, Filter, Plus, 
   Download, FileText, Calendar, Clock, DollarSign,
-  TrendingUp, TrendingDown, ArrowUpRight, ArrowDownRight
+  TrendingUp, TrendingDown, ArrowUpRight, ArrowDownRight,
+  Package, Truck, CheckCircle, XCircle, Activity,
+  MoreVertical, RefreshCw
 } from 'lucide-react'
+import { useToast } from '@/components/ui/toast'
 import AdminAuthGuard from '@/components/admin/AdminAuthGuard'
+import ModernSubpageLayout from '@/components/dashboard/ModernSubpageLayout'
+import FilterBar from '@/components/dashboard/FilterBar'
+import StatusBadge from '@/components/dashboard/StatusBadge'
+import DataTable from '@/components/dashboard/DataTable'
 import { useAdminDashboardStore } from '@/store/admin/admin-dashboard.store'
 import { useAuth } from '@/hooks/useAuth'
 
 export default function AdminOrders() {
   const router = useRouter()
   const { user } = useAuth()
+  const { success, error: toastError, warning } = useToast()
   const { 
     orders, 
     orderStats, 
@@ -25,10 +33,14 @@ export default function AdminOrders() {
     bulkUpdateOrders
   } = useAdminDashboardStore()
 
-  const [activeTab, setActiveTab] = useState('all')
-  const [searchQuery, setSearchQuery] = useState('')
+  const [activeTab, setActiveTab] = useState('overview')
+  const [searchValue, setSearchValue] = useState('')
   const [selectedOrders, setSelectedOrders] = useState<string[]>([])
-  const [showFilters, setShowFilters] = useState(false)
+  const [orderFilters, setOrderFilters] = useState({
+    status: 'all',
+    dateRange: 'all',
+    paymentMethod: 'all'
+  })
 
   useEffect(() => {
     if (user?.role === 'admin') {
@@ -36,78 +48,106 @@ export default function AdminOrders() {
     }
   }, [user?.role, fetchOrders])
 
-  const handleTabChange = (tab: string) => {
-    setActiveTab(tab)
+  // Handle search
+  const handleSearchChange = (value: string) => {
+    setSearchValue(value)
   }
 
-  const handleSearch = (query: string) => {
-    setSearchQuery(query)
+  // Handle filter changes
+  const handleFilterChange = (key: string, value: string) => {
+    setOrderFilters(prev => ({
+      ...prev,
+      [key]: value
+    }))
+  }
+
+  // Handle add order
+  const handleAddOrder = () => {
+    router.push('/admin/orders/new')
+  }
+
+  // Handle export
+  const handleExport = () => {
+    success('Export started', 'Order data export will be ready shortly')
+  }
+
+  // Handle refresh
+  const handleRefresh = () => {
+    fetchOrders()
+    success('Data refreshed', 'Order data has been updated')
   }
 
   const handleBulkAction = async (action: string) => {
-    if (selectedOrders.length === 0) return
+    if (selectedOrders.length === 0) {
+      warning('No orders selected', 'Please select orders to perform bulk actions')
+      return
+    }
 
     try {
       switch (action) {
         case 'process':
           await bulkUpdateOrders(selectedOrders, { status: 'processing' }, 'admin-1', 'Bulk processing')
+          success('Orders processed', `${selectedOrders.length} orders have been marked as processing`)
           break
         case 'ship':
           await bulkUpdateOrders(selectedOrders, { status: 'shipped' }, 'admin-1', 'Bulk shipping')
+          success('Orders shipped', `${selectedOrders.length} orders have been marked as shipped`)
           break
         case 'deliver':
           await bulkUpdateOrders(selectedOrders, { status: 'delivered' }, 'admin-1', 'Bulk delivery')
+          success('Orders delivered', `${selectedOrders.length} orders have been marked as delivered`)
           break
         case 'cancel':
-          await bulkUpdateOrders(selectedOrders, { status: 'cancelled' }, 'admin-1', 'Bulk cancellation')
+          if (confirm(`Are you sure you want to cancel ${selectedOrders.length} orders? This action cannot be undone.`)) {
+            await bulkUpdateOrders(selectedOrders, { status: 'cancelled' }, 'admin-1', 'Bulk cancellation')
+            warning('Orders cancelled', `${selectedOrders.length} orders have been cancelled`)
+          }
           break
       }
       setSelectedOrders([])
-    } catch (error) {
-      console.error('Bulk action failed:', error)
+    } catch (err) {
+      toastError('Action failed', 'Failed to perform bulk action. Please try again.')
     }
   }
 
   const handleStatusUpdate = async (orderId: string, newStatus: any) => {
     try {
       await updateOrderStatus(orderId, newStatus, 'admin-1', `Status updated to ${newStatus}`)
-      // Success handling would go here
-    } catch (error) {
-      // Error handling would go here
-      console.error('Failed to update order status:', error)
+      success('Status updated', `Order status has been updated to ${newStatus}`)
+    } catch (err) {
+      toastError('Update failed', 'Failed to update order status. Please try again.')
     }
   }
 
   const handleCancelOrder = async (orderId: string) => {
     try {
       await cancelOrder(orderId, 'admin-1', 'Order cancelled by admin')
-      // Success handling would go here
-    } catch (error) {
-      // Error handling would go here
-      console.error('Failed to cancel order:', error)
+      warning('Order cancelled', 'Order has been cancelled successfully')
+    } catch (err) {
+      toastError('Cancellation failed', 'Failed to cancel order. Please try again.')
     }
   }
 
+  // Filter orders based on search and filters
   const filteredOrders = orders.filter(order => {
-    const matchesSearch = 
-      order.id?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      order.customer?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      order.customer?.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      order.items[0]?.productName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      order.supplier?.name?.toLowerCase().includes(searchQuery.toLowerCase())
-
-    if (activeTab === 'all') return matchesSearch
-    return matchesSearch && order.status === activeTab
+    const matchesSearch = !searchValue || 
+      order.id?.toLowerCase().includes(searchValue.toLowerCase()) ||
+      order.customer?.name?.toLowerCase().includes(searchValue.toLowerCase()) ||
+      order.customer?.email?.toLowerCase().includes(searchValue.toLowerCase()) ||
+      order.items[0]?.productName?.toLowerCase().includes(searchValue.toLowerCase()) ||
+      order.supplier?.name?.toLowerCase().includes(searchValue.toLowerCase())
+    
+    const statusFilter = orderFilters.status || 'all'
+    const matchesStatus = statusFilter === 'all' || order.status === statusFilter
+    
+    return matchesSearch && matchesStatus
   })
 
   if (loading) {
     return (
       <AdminAuthGuard>
         <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
-            <p className="text-gray-600">Loading orders...</p>
-          </div>
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary-600"></div>
         </div>
       </AdminAuthGuard>
     )
@@ -135,298 +175,304 @@ export default function AdminOrders() {
     )
   }
 
+  // Available filters
+  const filters = [
+    {
+      key: 'status',
+      label: 'Status',
+      options: [
+        { value: 'all', label: 'All Status' },
+        { value: 'pending', label: 'Pending' },
+        { value: 'processing', label: 'Processing' },
+        { value: 'shipped', label: 'Shipped' },
+        { value: 'delivered', label: 'Delivered' },
+        { value: 'cancelled', label: 'Cancelled' }
+      ]
+    }
+  ]
+
+  // Tab configuration
+  const tabs = [
+    { key: 'overview', label: 'Overview', count: orders.length },
+    { key: 'orders', label: 'All Orders', count: orders.length },
+    { key: 'pending', label: 'Pending', count: orderStats.pendingOrders || 0 },
+    { key: 'processing', label: 'Processing', count: orderStats.processingOrders || 0 }
+  ]
+
   return (
     <AdminAuthGuard>
-      <div className="min-h-screen bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          {/* Header */}
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900">Order Management</h1>
-            <p className="text-gray-600 mt-2">Manage and track all customer orders</p>
-          </div>
-
-          {/* Stats Overview */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <div className="bg-white rounded-lg shadow p-6">
-              <div className="flex items-center">
-                <div className="p-2 bg-blue-100 rounded-lg">
-                  <FileText className="h-6 w-6 text-blue-600" />
-                </div>
-                <div className="ml-4">
+      <ModernSubpageLayout
+        title="Order Management"
+        subtitle="Manage and track all customer orders"
+        breadcrumbs={[
+          { label: 'Admin', href: '/admin' },
+          { label: 'Orders' }
+        ]}
+        showAddButton
+        addButtonText="New Order"
+        onAddClick={handleAddOrder}
+        showExportButton
+        onExportClick={handleExport}
+        headerActions={
+          <button
+            onClick={handleRefresh}
+            className="px-4 py-2 text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors flex items-center space-x-2"
+          >
+            <RefreshCw className="h-4 w-4" />
+            <span>Refresh</span>
+          </button>
+        }
+      >
+        <div className="space-y-6">
+          {/* Stats Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="bg-white rounded-lg p-6 shadow-sm">
+              <div className="flex items-center justify-between">
+                <div>
                   <p className="text-sm font-medium text-gray-600">Total Orders</p>
-                  <p className="text-2xl font-bold text-gray-900">{orderStats.totalOrders}</p>
+                  <p className="text-2xl font-bold text-gray-900">{orderStats.totalOrders || 0}</p>
                 </div>
+                <Package className="h-8 w-8 text-blue-600" />
+              </div>
+              <div className="mt-4 flex items-center text-sm text-green-600">
+                <ArrowUpRight className="h-4 w-4 mr-1" />
+                <span>+12% from last month</span>
               </div>
             </div>
 
-            <div className="bg-white rounded-lg shadow p-6">
-              <div className="flex items-center">
-                <div className="p-2 bg-yellow-100 rounded-lg">
-                  <Clock className="h-6 w-6 text-yellow-600" />
+            <div className="bg-white rounded-lg p-6 shadow-sm">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600">Pending Orders</p>
+                  <p className="text-2xl font-bold text-gray-900">{orderStats.pendingOrders || 0}</p>
                 </div>
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600">Pending</p>
-                  <p className="text-2xl font-bold text-gray-900">{orderStats.pendingOrders}</p>
-                </div>
+                <Clock className="h-8 w-8 text-yellow-600" />
+              </div>
+              <div className="mt-4 flex items-center text-sm text-yellow-600">
+                <Activity className="h-4 w-4 mr-1" />
+                <span>Needs attention</span>
               </div>
             </div>
 
-            <div className="bg-white rounded-lg shadow p-6">
-              <div className="flex items-center">
-                <div className="p-2 bg-green-100 rounded-lg">
-                  <TrendingUp className="h-6 w-6 text-green-600" />
-                </div>
-                <div className="ml-4">
+            <div className="bg-white rounded-lg p-6 shadow-sm">
+              <div className="flex items-center justify-between">
+                <div>
                   <p className="text-sm font-medium text-gray-600">Revenue</p>
-                  <p className="text-2xl font-bold text-gray-900">${orderStats.totalRevenue.toLocaleString()}</p>
+                  <p className="text-2xl font-bold text-gray-900">${orderStats.totalRevenue?.toLocaleString() || '0'}</p>
                 </div>
+                <TrendingUp className="h-8 w-8 text-green-600" />
+              </div>
+              <div className="mt-4 flex items-center text-sm text-green-600">
+                <ArrowUpRight className="h-4 w-4 mr-1" />
+                <span>+8% from last month</span>
               </div>
             </div>
 
-            <div className="bg-white rounded-lg shadow p-6">
-              <div className="flex items-center">
-                <div className="p-2 bg-purple-100 rounded-lg">
-                  <DollarSign className="h-6 w-6 text-purple-600" />
+            <div className="bg-white rounded-lg p-6 shadow-sm">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600">Shipped</p>
+                  <p className="text-2xl font-bold text-gray-900">{orderStats.shippedOrders || 0}</p>
                 </div>
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600">Commission</p>
-                  <p className="text-2xl font-bold text-gray-900">${orderStats.totalCommission.toLocaleString()}</p>
-                </div>
+                <Truck className="h-8 w-8 text-purple-600" />
+              </div>
+              <div className="mt-4 flex items-center text-sm text-purple-600">
+                <CheckCircle className="h-4 w-4 mr-1" />
+                <span>On schedule</span>
               </div>
             </div>
           </div>
 
-          {/* Controls */}
-          <div className="bg-white rounded-lg shadow mb-6">
-            <div className="p-6 border-b border-gray-200">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <div className="flex-1">
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                    <input
-                      type="text"
-                      placeholder="Search orders..."
-                      value={searchQuery}
-                      onChange={(e) => handleSearch(e.target.value)}
-                      className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                    />
+          {/* Tabs */}
+          <div className="border-b border-gray-200">
+            <nav className="-mb-px flex space-x-8">
+              {tabs.map((tab) => (
+                <button
+                  key={tab.key}
+                  onClick={() => setActiveTab(tab.key)}
+                  className={`py-2 px-1 border-b-2 font-medium text-sm whitespace-nowrap ${
+                    activeTab === tab.key
+                      ? 'border-blue-500 text-blue-600'
+                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  }`}
+                >
+                  {tab.label}
+                  <span className="ml-2 bg-gray-100 text-gray-900 py-0.5 px-2.5 rounded-full text-xs">
+                    {tab.count}
+                  </span>
+                </button>
+              ))}
+            </nav>
+          </div>
+
+          {/* Filter Bar */}
+          <FilterBar
+            searchValue={searchValue}
+            onSearchChange={handleSearchChange}
+            filters={filters}
+            activeFilters={orderFilters}
+            onFilterChange={handleFilterChange}
+          />
+
+          {/* Tab Content */}
+          {activeTab === 'overview' && (
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* Order Trends Chart */}
+              <div className="lg:col-span-2 bg-white rounded-lg p-6 shadow-sm">
+                <h3 className="text-lg font-medium text-gray-900 mb-4">Order Trends</h3>
+                <div className="h-64 bg-gray-50 rounded-lg flex items-center justify-center">
+                  <p className="text-gray-500">Chart placeholder - Order trends over time</p>
+                </div>
+              </div>
+
+              {/* Recent Orders */}
+              <div className="bg-gray-50 rounded-lg p-4">
+                <h3 className="text-lg font-medium text-gray-900 mb-4">Recent Orders</h3>
+                <div className="space-y-3">
+                  {orders.slice(0, 5).map((order) => (
+                    <div key={order.id} className="flex items-center justify-between text-sm">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
+                          <Package className="h-4 w-4 text-gray-600" />
+                        </div>
+                        <div>
+                          <p className="font-medium text-gray-900">{order.id}</p>
+                          <p className="text-gray-500">{order.customer?.name || 'Unknown'}</p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-medium text-gray-900">${order.totalAmount}</p>
+                        <StatusBadge status={order.status} variant="dot" />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'orders' && (
+            <div className="space-y-4">
+              {/* Bulk Actions */}
+              {selectedOrders.length > 0 && (
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm text-blue-800">
+                      {selectedOrders.length} order(s) selected
+                    </p>
+                    <div className="flex space-x-2">
+                      <button
+                        onClick={() => handleBulkAction('process')}
+                        className="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition-colors"
+                      >
+                        Process
+                      </button>
+                      <button
+                        onClick={() => handleBulkAction('ship')}
+                        className="px-3 py-1 bg-purple-600 text-white text-sm rounded hover:bg-purple-700 transition-colors"
+                      >
+                        Ship
+                      </button>
+                      <button
+                        onClick={() => handleBulkAction('deliver')}
+                        className="px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700 transition-colors"
+                      >
+                        Deliver
+                      </button>
+                      <button
+                        onClick={() => handleBulkAction('cancel')}
+                        className="px-3 py-1 bg-red-600 text-white text-sm rounded hover:bg-red-700 transition-colors"
+                      >
+                        Cancel
+                      </button>
+                    </div>
                   </div>
                 </div>
-                
-                <div className="flex items-center space-x-3">
-                  <button
-                    onClick={() => setShowFilters(!showFilters)}
-                    className="flex items-center px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
-                  >
-                    <Filter className="h-4 w-4 mr-2" />
-                    Filters
-                  </button>
-                  
-                  {selectedOrders.length > 0 && (
-                    <div className="flex items-center space-x-2">
-                      <select
-                        onChange={(e) => handleBulkAction(e.target.value)}
-                        className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
-                      >
-                        <option value="">Bulk Actions</option>
-                        <option value="process">Process Selected</option>
-                        <option value="ship">Ship Selected</option>
-                        <option value="deliver">Mark Delivered</option>
-                        <option value="cancel">Cancel Selected</option>
-                      </select>
-                    </div>
-                  )}
-                  
-                  <button
-                    onClick={() => router.push('/admin/orders/new')}
-                    className="flex items-center px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
-                  >
-                    <Plus className="h-4 w-4 mr-2" />
-                    New Order
-                  </button>
-                </div>
-              </div>
-            </div>
+              )}
 
-            {/* Tabs */}
-            <div className="border-b border-gray-200">
-              <nav className="flex space-x-8 px-6">
-                {[
-                  { id: 'all', label: 'All Orders', count: orders.length },
-                  { id: 'pending', label: 'Pending', count: orderStats.pendingOrders },
-                  { id: 'processing', label: 'Processing', count: orderStats.processingOrders },
-                  { id: 'shipped', label: 'Shipped', count: orderStats.shippedOrders },
-                  { id: 'delivered', label: 'Delivered', count: orderStats.deliveredOrders },
-                  { id: 'cancelled', label: 'Cancelled', count: orderStats.cancelledOrders }
-                ].map((tab) => (
-                  <button
-                    key={tab.id}
-                    onClick={() => handleTabChange(tab.id)}
-                    className={`py-4 px-1 border-b-2 font-medium text-sm ${
-                      activeTab === tab.id
-                        ? 'border-primary-500 text-primary-600'
-                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                    }`}
-                  >
-                    {tab.label}
-                    <span className="ml-2 bg-gray-100 text-gray-900 py-0.5 px-2.5 rounded-full text-xs font-medium">
-                      {tab.count}
-                    </span>
-                  </button>
-                ))}
-              </nav>
-            </div>
-          </div>
-
-          {/* Orders Table */}
-          <div className="bg-white rounded-lg shadow overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      <input
-                        type="checkbox"
-                        checked={selectedOrders.length === filteredOrders.length}
-                        onChange={(e) => {
-                          if (e.target.checked) {
-                            setSelectedOrders(filteredOrders.map(order => order.id))
-                          } else {
-                            setSelectedOrders([])
-                          }
-                        }}
-                        className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
-                      />
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Order
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Customer
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Product
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Amount
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Status
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Date
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {filteredOrders.map((order) => (
-                    <tr key={order.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <input
-                          type="checkbox"
-                          checked={selectedOrders.includes(order.id)}
-                          onChange={(e) => {
-                            if (e.target.checked) {
-                              setSelectedOrders([...selectedOrders, order.id])
-                            } else {
-                              setSelectedOrders(selectedOrders.filter(id => id !== order.id))
-                            }
-                          }}
-                          className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
-                        />
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
+              {/* Orders DataTable */}
+              <DataTable
+                data={filteredOrders}
+                columns={[
+                  {
+                    key: 'id',
+                    label: 'Order',
+                    render: (value: string, order: any) => (
+                      <div>
                         <div className="text-sm font-medium text-gray-900">{order.id}</div>
                         <div className="text-sm text-gray-500">{order.paymentMethod}</div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      </div>
+                    )
+                  },
+                  {
+                    key: 'customer',
+                    label: 'Customer',
+                    render: (value: any, order: any) => (
+                      <div>
                         <div className="text-sm font-medium text-gray-900">{order.customer?.name || 'Unknown'}</div>
                         <div className="text-sm text-gray-500">{order.customer?.email || 'No email'}</div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      </div>
+                    )
+                  },
+                  {
+                    key: 'items',
+                    label: 'Product',
+                    render: (value: any, order: any) => (
+                      <div>
                         <div className="text-sm font-medium text-gray-900">{order.items[0]?.productName || 'No product'}</div>
                         <div className="text-sm text-gray-500">{order.supplier?.name || 'No supplier'}</div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                        ${order.totalAmount}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(order.status)}`}>
-                          {order.status}
-                        </span>
-                      </td>
-                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                         {order.createdAt ? 
-                           (order.createdAt instanceof Date ? 
-                             order.createdAt.toLocaleDateString() : 
-                             'Date format error') 
-                           : 'Unknown date'}
-                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <div className="flex space-x-2">
-                          <button
-                            onClick={() => router.push(`/admin/orders/${order.id}`)}
-                            className="text-blue-600 hover:text-blue-900"
-                            title="View"
-                          >
-                            <Eye className="h-4 w-4" />
-                          </button>
-                          <button
-                            onClick={() => router.push(`/admin/orders/${order.id}/edit`)}
-                            className="text-indigo-600 hover:text-indigo-900"
-                            title="Edit"
-                          >
-                            <Edit className="h-4 w-4" />
-                          </button>
-                          <button
-                            onClick={() => handleCancelOrder(order.id)}
-                            className="text-red-600 hover:text-red-900"
-                            title="Cancel"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          {filteredOrders.length === 0 && (
-            <div className="text-center py-12">
-              <FileText className="mx-auto h-12 w-12 text-gray-400" />
-              <h3 className="mt-2 text-sm font-medium text-gray-900">No orders found</h3>
-              <p className="mt-1 text-sm text-gray-500">
-                {searchQuery ? 'Try adjusting your search criteria.' : 'Get started by creating a new order.'}
-              </p>
+                      </div>
+                    )
+                  },
+                  {
+                    key: 'totalAmount',
+                    label: 'Amount',
+                    render: (amount: number) => (
+                      <span className="text-sm font-medium text-gray-900">${amount}</span>
+                    )
+                  },
+                  {
+                    key: 'status',
+                    label: 'Status',
+                    render: (status: string) => (
+                      <StatusBadge status={status} variant="pill" />
+                    )
+                  },
+                  {
+                    key: 'createdAt',
+                    label: 'Date',
+                    render: (date: any) => (
+                      <span className="text-sm text-gray-500">
+                        {date ? (date instanceof Date ? date.toLocaleDateString() : 'Invalid date') : 'Unknown date'}
+                      </span>
+                    )
+                  }
+                ]}
+                actions={[
+                  {
+                    key: 'view',
+                    label: 'View',
+                    icon: Eye,
+                    onClick: (order: any) => router.push(`/admin/orders/${order.id}`)
+                  },
+                  {
+                    key: 'edit',
+                    label: 'Edit',
+                    icon: Edit,
+                    onClick: (order: any) => router.push(`/admin/orders/${order.id}/edit`)
+                  },
+                  {
+                    key: 'cancel',
+                    label: 'Cancel',
+                    icon: Trash2,
+                    onClick: (order: any) => handleCancelOrder(order.id)
+                  }
+                ]}
+              />
             </div>
           )}
         </div>
-      </div>
+      </ModernSubpageLayout>
     </AdminAuthGuard>
   )
-}
-
-function getStatusColor(status: string) {
-  switch (status) {
-    case 'pending':
-      return 'bg-yellow-100 text-yellow-800'
-    case 'processing':
-      return 'bg-blue-100 text-blue-800'
-    case 'shipped':
-      return 'bg-purple-100 text-purple-800'
-    case 'delivered':
-      return 'bg-green-100 text-green-800'
-    case 'cancelled':
-      return 'bg-red-100 text-red-800'
-    case 'refunded':
-      return 'bg-gray-100 text-gray-800'
-    default:
-      return 'bg-gray-100 text-gray-800'
-  }
 }

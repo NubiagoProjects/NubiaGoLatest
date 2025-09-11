@@ -1,12 +1,13 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import { 
   HelpCircle, MessageCircle, Phone, Mail, FileText,
-  ArrowLeft, ChevronDown, ChevronUp, Send
+  ChevronDown, ChevronUp, Send, LifeBuoy, Clock, Users
 } from 'lucide-react'
 import Link from 'next/link'
+import ModernSubpageLayout from '@/components/dashboard/ModernSubpageLayout'
+import StatusBadge from '@/components/dashboard/StatusBadge'
 
 interface FAQItem {
   id: string
@@ -24,7 +25,6 @@ interface SupportTicket {
 }
 
 export default function CustomerSupportPage() {
-  const router = useRouter()
   const [activeCategory, setActiveCategory] = useState('all')
   const [expandedFAQ, setExpandedFAQ] = useState<string | null>(null)
   const [showContactForm, setShowContactForm] = useState(false)
@@ -94,12 +94,21 @@ export default function CustomerSupportPage() {
     activeCategory === 'all' || item.category === activeCategory
   )
 
+  const breadcrumbs = [
+    { label: 'Dashboard', href: '/customer' },
+    { label: 'Support', href: '/customer/support' }
+  ]
+
   const handleSubmitTicket = (e: React.FormEvent) => {
     e.preventDefault()
-    // Simulate ticket submission
-    alert('Support ticket submitted successfully! We\'ll get back to you soon.')
+    console.log('Support ticket submitted:', contactForm)
+    // TODO: Implement toast notification
     setShowContactForm(false)
     setContactForm({ subject: '', message: '', priority: 'medium' })
+  }
+
+  const handleNewTicket = () => {
+    setShowContactForm(true)
   }
 
   const getStatusColor = (status: string) => {
@@ -112,24 +121,50 @@ export default function CustomerSupportPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center space-x-4">
-            <Link href="/customer" className="text-gray-400 hover:text-gray-500">
-              <ArrowLeft className="h-5 w-5" />
-            </Link>
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">Customer Support</h1>
-              <p className="text-gray-600">Get help with your orders and account</p>
+    <ModernSubpageLayout
+      title="Customer Support"
+      subtitle="Get help with your orders and account"
+      breadcrumbs={breadcrumbs}
+      showAddButton={true}
+      addButtonText="New Ticket"
+      onAddClick={handleNewTicket}
+    >
+      {/* Support Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+        <div className="bg-white rounded-lg shadow p-6">
+          <div className="flex items-center">
+            <LifeBuoy className="h-8 w-8 text-blue-600" />
+            <div className="ml-4">
+              <p className="text-sm font-medium text-gray-500">Active Tickets</p>
+              <p className="text-2xl font-semibold text-gray-900">
+                {supportTickets.filter(t => t.status !== 'resolved').length}
+              </p>
             </div>
           </div>
         </div>
+        <div className="bg-white rounded-lg shadow p-6">
+          <div className="flex items-center">
+            <Clock className="h-8 w-8 text-green-600" />
+            <div className="ml-4">
+              <p className="text-sm font-medium text-gray-500">Avg Response Time</p>
+              <p className="text-2xl font-semibold text-gray-900">2h</p>
+            </div>
+          </div>
+        </div>
+        <div className="bg-white rounded-lg shadow p-6">
+          <div className="flex items-center">
+            <Users className="h-8 w-8 text-purple-600" />
+            <div className="ml-4">
+              <p className="text-sm font-medium text-gray-500">Support Rating</p>
+              <p className="text-2xl font-semibold text-gray-900">4.8/5</p>
+            </div>
+          </div>
+        </div>
+      </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Main Content */}
-          <div className="lg:col-span-2 space-y-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Main Content */}
+        <div className="lg:col-span-2 space-y-6">
             {/* Quick Contact */}
             <div className="bg-white rounded-lg shadow p-6">
               <h2 className="text-lg font-medium text-gray-900 mb-4">Quick Contact</h2>
@@ -283,9 +318,7 @@ export default function CustomerSupportPage() {
                   <div key={ticket.id} className="border border-gray-200 rounded-lg p-4">
                     <div className="flex items-center justify-between mb-2">
                       <p className="text-sm font-medium text-gray-900">{ticket.subject}</p>
-                      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(ticket.status)}`}>
-                        {ticket.status}
-                      </span>
+                      <StatusBadge status={ticket.status} />
                     </div>
                     <p className="text-xs text-gray-500">Created: {ticket.createdAt}</p>
                     <p className="text-xs text-gray-500">Updated: {ticket.lastUpdated}</p>
@@ -348,9 +381,8 @@ export default function CustomerSupportPage() {
                 </div>
               </div>
             </div>
-          </div>
         </div>
       </div>
-    </div>
+    </ModernSubpageLayout>
   )
 } 

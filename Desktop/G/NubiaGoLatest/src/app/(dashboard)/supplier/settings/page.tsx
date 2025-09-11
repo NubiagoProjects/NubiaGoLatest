@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import ModernDashboardLayout from '@/components/dashboard/ModernDashboardLayout'
+import ModernSubpageLayout from '@/components/dashboard/ModernSubpageLayout'
 import { 
   Settings, 
   User,
@@ -9,17 +9,9 @@ import {
   Shield,
   CreditCard,
   Truck,
-  Globe,
   Save,
   Eye,
-  EyeOff,
-  Grid3X3,
-  Package,
-  ShoppingBag,
-  BarChart3,
-  TrendingUp,
-  Users,
-  MessageSquare
+  EyeOff
 } from 'lucide-react'
 
 export default function SupplierSettingsPage() {
@@ -32,19 +24,6 @@ export default function SupplierSettingsPage() {
     marketingEmails: false
   })
 
-  const sidebarItems = [
-    { id: 'overview', icon: Grid3X3, label: 'Dashboard', path: '/supplier' },
-    { id: 'products', icon: Package, label: 'Products', path: '/supplier/products' },
-    { id: 'orders', icon: ShoppingBag, label: 'Orders', path: '/supplier/orders' },
-    { id: 'inventory', icon: BarChart3, label: 'Inventory', path: '/supplier/inventory' },
-    { id: 'shipping', icon: Truck, label: 'Shipping', path: '/supplier/shipping' },
-    { id: 'analytics', icon: TrendingUp, label: 'Analytics', path: '/supplier/analytics' },
-    { id: 'customers', icon: Users, label: 'Customers', path: '/supplier/customers' },
-    { id: 'payments', icon: CreditCard, label: 'Payments', path: '/supplier/payments' },
-    { id: 'support', icon: MessageSquare, label: 'Support', path: '/supplier/support' },
-    { id: 'settings', icon: Settings, label: 'Settings', path: '/supplier/settings' }
-  ]
-
   const handleNotificationChange = (key: string) => {
     setNotifications(prev => ({
       ...prev,
@@ -52,20 +31,23 @@ export default function SupplierSettingsPage() {
     }))
   }
 
+  const handleSave = () => {
+    console.log('Saving settings...')
+    // TODO: Implement save functionality
+  }
+
+  const breadcrumbs = [
+    { label: 'Dashboard', href: '/supplier' },
+    { label: 'Settings', href: '/supplier/settings' }
+  ]
+
   return (
-    <ModernDashboardLayout 
-      sidebarItems={sidebarItems}
+    <ModernSubpageLayout
       title="Settings"
-      subtitle="Manage your account and preferences"
+      subtitle="Manage your account settings and preferences"
+      breadcrumbs={breadcrumbs}
     >
       <div className="space-y-6">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
-            <p className="text-gray-600">Manage your account settings and preferences</p>
-          </div>
-        </div>
 
         {/* Tabs */}
         <div className="border-b border-gray-200">
@@ -74,7 +56,7 @@ export default function SupplierSettingsPage() {
               onClick={() => setActiveTab('profile')}
               className={`py-2 px-1 border-b-2 font-medium text-sm ${
                 activeTab === 'profile'
-                  ? 'border-orange-500 text-orange-600'
+                  ? 'border-blue-500 text-blue-600'
                   : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
               }`}
             >
@@ -85,7 +67,7 @@ export default function SupplierSettingsPage() {
               onClick={() => setActiveTab('notifications')}
               className={`py-2 px-1 border-b-2 font-medium text-sm ${
                 activeTab === 'notifications'
-                  ? 'border-orange-500 text-orange-600'
+                  ? 'border-blue-500 text-blue-600'
                   : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
               }`}
             >
@@ -96,7 +78,7 @@ export default function SupplierSettingsPage() {
               onClick={() => setActiveTab('security')}
               className={`py-2 px-1 border-b-2 font-medium text-sm ${
                 activeTab === 'security'
-                  ? 'border-orange-500 text-orange-600'
+                  ? 'border-blue-500 text-blue-600'
                   : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
               }`}
             >
@@ -107,7 +89,7 @@ export default function SupplierSettingsPage() {
               onClick={() => setActiveTab('billing')}
               className={`py-2 px-1 border-b-2 font-medium text-sm ${
                 activeTab === 'billing'
-                  ? 'border-orange-500 text-orange-600'
+                  ? 'border-blue-500 text-blue-600'
                   : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
               }`}
             >
@@ -118,7 +100,7 @@ export default function SupplierSettingsPage() {
               onClick={() => setActiveTab('shipping')}
               className={`py-2 px-1 border-b-2 font-medium text-sm ${
                 activeTab === 'shipping'
-                  ? 'border-orange-500 text-orange-600'
+                  ? 'border-blue-500 text-blue-600'
                   : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
               }`}
             >
@@ -141,7 +123,7 @@ export default function SupplierSettingsPage() {
                   <input
                     type="text"
                     defaultValue="Tech Supplies Co."
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   />
                 </div>
                 <div>
@@ -151,7 +133,7 @@ export default function SupplierSettingsPage() {
                   <input
                     type="text"
                     defaultValue="John Supplier"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   />
                 </div>
               </div>
@@ -163,7 +145,7 @@ export default function SupplierSettingsPage() {
                   <input
                     type="email"
                     defaultValue="supplier@nubiago.com"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   />
                 </div>
                 <div>
@@ -173,7 +155,7 @@ export default function SupplierSettingsPage() {
                   <input
                     type="tel"
                     defaultValue="+90 555 123 4567"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   />
                 </div>
               </div>
@@ -184,7 +166,7 @@ export default function SupplierSettingsPage() {
                 <textarea
                   rows={3}
                   defaultValue="123 Business Street, Istanbul, Turkey 34000"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 ></textarea>
               </div>
               <div>
@@ -194,13 +176,13 @@ export default function SupplierSettingsPage() {
                 <textarea
                   rows={4}
                   defaultValue="We specialize in high-quality tech accessories and electronics, serving customers across Turkey with reliable products and excellent service."
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 ></textarea>
               </div>
               <div className="flex justify-end">
                 <button
                   type="submit"
-                  className="inline-flex items-center px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors"
+                  className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                 >
                   <Save className="h-4 w-4 mr-2" />
                   Save Changes
@@ -222,7 +204,7 @@ export default function SupplierSettingsPage() {
                 <button
                   onClick={() => handleNotificationChange('orderUpdates')}
                   className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                    notifications.orderUpdates ? 'bg-orange-600' : 'bg-gray-200'
+                    notifications.orderUpdates ? 'bg-blue-600' : 'bg-gray-200'
                   }`}
                 >
                   <span
@@ -240,7 +222,7 @@ export default function SupplierSettingsPage() {
                 <button
                   onClick={() => handleNotificationChange('paymentAlerts')}
                   className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                    notifications.paymentAlerts ? 'bg-orange-600' : 'bg-gray-200'
+                    notifications.paymentAlerts ? 'bg-blue-600' : 'bg-gray-200'
                   }`}
                 >
                   <span
@@ -258,7 +240,7 @@ export default function SupplierSettingsPage() {
                 <button
                   onClick={() => handleNotificationChange('inventoryAlerts')}
                   className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                    notifications.inventoryAlerts ? 'bg-orange-600' : 'bg-gray-200'
+                    notifications.inventoryAlerts ? 'bg-blue-600' : 'bg-gray-200'
                   }`}
                 >
                   <span
@@ -276,7 +258,7 @@ export default function SupplierSettingsPage() {
                 <button
                   onClick={() => handleNotificationChange('marketingEmails')}
                   className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                    notifications.marketingEmails ? 'bg-orange-600' : 'bg-gray-200'
+                    notifications.marketingEmails ? 'bg-blue-600' : 'bg-gray-200'
                   }`}
                 >
                   <span
@@ -321,7 +303,7 @@ export default function SupplierSettingsPage() {
                     </label>
                     <input
                       type="password"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     />
                   </div>
                   <div>
@@ -330,7 +312,7 @@ export default function SupplierSettingsPage() {
                     </label>
                     <input
                       type="password"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     />
                   </div>
                 </div>
@@ -342,7 +324,7 @@ export default function SupplierSettingsPage() {
                     <p className="font-medium text-gray-900">Enable 2FA</p>
                     <p className="text-sm text-gray-600">Add an extra layer of security to your account</p>
                   </div>
-                  <button className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors">
+                  <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
                     Enable
                   </button>
                 </div>
@@ -350,7 +332,7 @@ export default function SupplierSettingsPage() {
               <div className="flex justify-end">
                 <button
                   type="submit"
-                  className="inline-flex items-center px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors"
+                  className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                 >
                   <Save className="h-4 w-4 mr-2" />
                   Update Security
@@ -375,7 +357,7 @@ export default function SupplierSettingsPage() {
                         <p className="text-sm text-gray-600">**** **** **** 1234</p>
                       </div>
                     </div>
-                    <button className="text-orange-600 hover:text-orange-700 text-sm font-medium">
+                    <button className="text-blue-600 hover:text-blue-700 text-sm font-medium">
                       Update
                     </button>
                   </div>
@@ -391,7 +373,7 @@ export default function SupplierSettingsPage() {
                     <input
                       type="text"
                       defaultValue="TR1234567890"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     />
                   </div>
                   <div>
@@ -401,7 +383,7 @@ export default function SupplierSettingsPage() {
                     <input
                       type="text"
                       defaultValue="TR123456789012345"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     />
                   </div>
                 </div>
@@ -436,7 +418,7 @@ export default function SupplierSettingsPage() {
                     <input
                       type="text"
                       defaultValue="123 Business Street"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     />
                   </div>
                   <div>
@@ -446,7 +428,7 @@ export default function SupplierSettingsPage() {
                     <input
                       type="text"
                       placeholder="Suite, floor, etc."
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     />
                   </div>
                   <div>
@@ -456,7 +438,7 @@ export default function SupplierSettingsPage() {
                     <input
                       type="text"
                       defaultValue="Istanbul"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     />
                   </div>
                   <div>
@@ -466,7 +448,7 @@ export default function SupplierSettingsPage() {
                     <input
                       type="text"
                       defaultValue="34000"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     />
                   </div>
                 </div>
@@ -502,7 +484,7 @@ export default function SupplierSettingsPage() {
               <div className="flex justify-end">
                 <button
                   type="submit"
-                  className="inline-flex items-center px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors"
+                  className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                 >
                   <Save className="h-4 w-4 mr-2" />
                   Save Settings
@@ -512,6 +494,6 @@ export default function SupplierSettingsPage() {
           </div>
         )}
       </div>
-    </ModernDashboardLayout>
+    </ModernSubpageLayout>
   )
 }

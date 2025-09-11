@@ -16,6 +16,7 @@ import Link from 'next/link'
 import AdminAuthGuard from '@/components/admin/AdminAuthGuard'
 import { useAdminDashboardStore } from '@/store/admin/admin-dashboard.store'
 import { useAuth } from '@/hooks/useAuth'
+import { useToast } from '@/components/ui/toast'
 import ModernDashboardLayout from '@/components/dashboard/ModernDashboardLayout'
 import ModernDashboardCards, { ActivityCard, ProgressCard } from '@/components/dashboard/ModernDashboardCards'
 import ResponsiveDashboardGrid, { ResponsiveStatsCard, ResponsiveActionCard } from '@/components/dashboard/ResponsiveDashboardGrid'
@@ -24,6 +25,7 @@ import ResponsiveDataView from '@/components/dashboard/ResponsiveDataView'
 export default function AdminDashboard() {
   const router = useRouter()
   const { user: adminUser } = useAuth()
+  const { success, error } = useToast()
   const {
     // Store state
     users,
@@ -204,7 +206,7 @@ export default function AdminDashboard() {
     { key: 'edit', label: 'Edit', icon: Edit, onClick: (user: any) => router.push(`/admin/users/${user.id}/edit`) },
     { key: 'suspend', label: 'Suspend', icon: XCircle, onClick: (user: any) => {
       if (confirm(`Are you sure you want to suspend user ${user.name}?`)) {
-        alert(`User ${user.name} has been suspended`)
+        success(`User ${user.name} has been suspended`)
         // In real app, call API to suspend user
       }
     }}

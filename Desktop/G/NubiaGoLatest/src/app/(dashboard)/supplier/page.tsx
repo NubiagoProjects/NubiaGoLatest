@@ -17,6 +17,8 @@ import ModernDashboardLayout from '@/components/dashboard/ModernDashboardLayout'
 import ModernDashboardCards, { ActivityCard, ProgressCard } from '@/components/dashboard/ModernDashboardCards'
 import ResponsiveDashboardGrid, { ResponsiveStatsCard, ResponsiveActionCard } from '@/components/dashboard/ResponsiveDashboardGrid'
 import ResponsiveDataView from '@/components/dashboard/ResponsiveDataView'
+import AdminAuthGuard from '@/components/admin/AdminAuthGuard'
+import { useToast } from '@/components/ui/toast'
 
 interface Product {
   id: string
@@ -72,7 +74,7 @@ interface SupplierStats {
 
 export default function SupplierDashboard() {
   const router = useRouter()
-  // const { success, error } = useToast() // Removed for now
+  const { success, error } = useToast()
   const [activeTab, setActiveTab] = useState('overview')
   const [products, setProducts] = useState<Product[]>([])
   const [orders, setOrders] = useState<Order[]>([])
@@ -133,21 +135,31 @@ export default function SupplierDashboard() {
 
   // Handle export data
   const handleExportData = () => {
-    const data = {
-      products: products,
-      orders: orders,
-      stats: stats
-    }
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
+    // Create CSV data
+    const csvData = orders.map(order => ({
+      id: order.id,
+      customer: order.customerName,
+      total: order.total,
+      status: order.status,
+      date: order.createdAt
+    }))
+    
+    // Convert to CSV string
+    const csvString = [
+      Object.keys(csvData[0]).join(','),
+      ...csvData.map(row => Object.values(row).join(','))
+    ].join('\n')
+    
+    // Download CSV
+    const blob = new Blob([csvString], { type: 'text/csv' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = `nubiago-supplier-data-${new Date().toISOString().split('T')[0]}.json`
-    document.body.appendChild(a)
+    a.download = 'supplier-data.csv'
     a.click()
     document.body.removeChild(a)
     URL.revokeObjectURL(url)
-    alert('Data exported successfully!')
+    success('Data exported successfully!')
   }
 
   // Handle view reports
@@ -204,7 +216,7 @@ export default function SupplierDashboard() {
         break
       case 'process':
         // Process order logic
-        alert('Order processing started!')
+        success('Order processing started!')
         break
       default:
         break
@@ -514,10 +526,12 @@ export default function SupplierDashboard() {
 
 
   return (
-    <ModernDashboardLayout
+    <AdminAuthGuard>
+      <ModernDashboardLayout
       title="Supplier Dashboard"
       subtitle="Manage your inventory, process orders, and track your business performance."
       sidebarItems={sidebarItems}
+      breadcrumbs={[{ label: 'Dashboard', href: '/supplier' }]}
     >
       <div className="space-y-8">
         {/* Dashboard Cards */}
@@ -791,5 +805,6 @@ export default function SupplierDashboard() {
         </div>
       )}
     </ModernDashboardLayout>
+    </AdminAuthGuard>
   )
 } 

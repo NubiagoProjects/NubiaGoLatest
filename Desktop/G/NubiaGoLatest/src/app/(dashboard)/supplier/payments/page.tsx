@@ -1,45 +1,50 @@
 'use client'
 
 import { useState } from 'react'
-import { ModernDashboardLayout } from '@/components/dashboard/ModernDashboardLayout'
+import ModernSubpageLayout from '@/components/dashboard/ModernSubpageLayout'
+import FilterBar from '@/components/dashboard/FilterBar'
+import StatusBadge from '@/components/dashboard/StatusBadge'
+import DataTable from '@/components/dashboard/DataTable'
 import { 
   CreditCard, 
   DollarSign,
   TrendingUp,
   TrendingDown,
-  Calendar,
   Download,
-  Filter,
-  Search,
   CheckCircle,
   Clock,
   XCircle,
-  AlertTriangle,
-  Grid3X3,
-  Package,
-  ShoppingBag,
-  BarChart3,
-  Truck,
-  Users,
-  MessageSquare,
-  Settings
+  Eye,
+  RefreshCw
 } from 'lucide-react'
 
 export default function SupplierPaymentsPage() {
   const [searchTerm, setSearchTerm] = useState('')
-  const [filterStatus, setFilterStatus] = useState('all')
+  const [activeFilters, setActiveFilters] = useState<Record<string, string>>({})
 
-  const sidebarItems = [
-    { id: 'overview', icon: Grid3X3, label: 'Dashboard', path: '/supplier' },
-    { id: 'products', icon: Package, label: 'Products', path: '/supplier/products' },
-    { id: 'orders', icon: ShoppingBag, label: 'Orders', path: '/supplier/orders' },
-    { id: 'inventory', icon: BarChart3, label: 'Inventory', path: '/supplier/inventory' },
-    { id: 'shipping', icon: Truck, label: 'Shipping', path: '/supplier/shipping' },
-    { id: 'analytics', icon: TrendingUp, label: 'Analytics', path: '/supplier/analytics' },
-    { id: 'customers', icon: Users, label: 'Customers', path: '/supplier/customers' },
-    { id: 'payments', icon: CreditCard, label: 'Payments', path: '/supplier/payments' },
-    { id: 'support', icon: MessageSquare, label: 'Support', path: '/supplier/support' },
-    { id: 'settings', icon: Settings, label: 'Settings', path: '/supplier/settings' }
+  const filterOptions = [
+    {
+      key: 'status',
+      label: 'Payment Status',
+      options: [
+        { value: 'all', label: 'All Status' },
+        { value: 'completed', label: 'Completed' },
+        { value: 'pending', label: 'Pending' },
+        { value: 'processing', label: 'Processing' },
+        { value: 'failed', label: 'Failed' }
+      ]
+    },
+    {
+      key: 'method',
+      label: 'Payment Method',
+      options: [
+        { value: 'all', label: 'All Methods' },
+        { value: 'Credit Card', label: 'Credit Card' },
+        { value: 'PayPal', label: 'PayPal' },
+        { value: 'Bank Transfer', label: 'Bank Transfer' },
+        { value: 'Mobile Money', label: 'Mobile Money' }
+      ]
+    }
   ]
 
   const payments = [
@@ -105,22 +110,35 @@ export default function SupplierPaymentsPage() {
     }
   }
 
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'completed': return <CheckCircle className="h-4 w-4" />
-      case 'pending': return <Clock className="h-4 w-4" />
-      case 'processing': return <Clock className="h-4 w-4" />
-      case 'failed': return <XCircle className="h-4 w-4" />
-      default: return <AlertTriangle className="h-4 w-4" />
-    }
+  const handleFilterChange = (filterKey: string, value: string) => {
+    setActiveFilters(prev => ({
+      ...prev,
+      [filterKey]: value
+    }))
+  }
+
+  const handleExport = () => {
+    console.log('Exporting payment data...')
+    // TODO: Implement export functionality
+  }
+
+  const handleRefresh = () => {
+    console.log('Refreshing payment data...')
+    // TODO: Implement refresh functionality
   }
 
   const filteredPayments = payments.filter(payment => {
     const matchesSearch = payment.customer.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          payment.orderId.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          payment.id.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesFilter = filterStatus === 'all' || payment.status === filterStatus
-    return matchesSearch && matchesFilter
+    
+    const statusFilter = activeFilters.status || 'all'
+    const methodFilter = activeFilters.method || 'all'
+    
+    const matchesStatus = statusFilter === 'all' || payment.status === statusFilter
+    const matchesMethod = methodFilter === 'all' || payment.method === methodFilter
+    
+    return matchesSearch && matchesStatus && matchesMethod
   })
 
   const totalRevenue = payments.filter(p => p.status === 'completed').reduce((sum, p) => sum + p.amount, 0)
@@ -128,26 +146,68 @@ export default function SupplierPaymentsPage() {
   const totalFees = payments.filter(p => p.status === 'completed').reduce((sum, p) => sum + p.fee, 0)
   const successRate = ((payments.filter(p => p.status === 'completed').length / payments.length) * 100).toFixed(1)
 
+  const breadcrumbs = [
+    { label: 'Dashboard', href: '/supplier' },
+    { label: 'Payments', href: '/supplier/payments' }
+  ]
+
+  const paymentColumns = [
+    { key: 'id', label: 'Payment ID' },
+    { 
+      key: 'orderId', 
+      label: 'Order ID',
+      render: (value: string) => (
+        <span className="text-blue-600 hover:text-blue-800 cursor-pointer">{value}</span>
+      )
+    },
+    { key: 'customer', label: 'Customer' },
+    { 
+      key: 'amount', 
+      label: 'Amount',
+      render: (value: number) => (
+        <span className="font-medium">₦{value.toFixed(2)}</span>
+      )
+    },
+    { key: 'method', label: 'Method' },
+    { 
+      key: 'status', 
+      label: 'Status',
+      render: (value: string) => (
+        <StatusBadge status={value} variant="default" />
+      )
+    },
+    { key: 'date', label: 'Date' },
+    { 
+      key: 'fee', 
+      label: 'Fee',
+      render: (value: number) => (
+        <span>₦{value.toFixed(2)}</span>
+      )
+    }
+  ]
+
+  const paymentActions = [
+    { key: 'view', label: 'View', icon: Eye, onClick: (payment: any) => console.log('View payment:', payment.id) }
+  ]
+
   return (
-    <ModernDashboardLayout 
-      sidebarItems={sidebarItems}
+    <ModernSubpageLayout
       title="Payment Management"
-      subtitle="Track payments and financial transactions"
+      subtitle="Monitor and manage your payment transactions"
+      breadcrumbs={breadcrumbs}
+      showExportButton
+      onExportClick={handleExport}
+      headerActions={
+        <button
+          onClick={handleRefresh}
+          className="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
+        >
+          <RefreshCw className="h-4 w-4 mr-2" />
+          Refresh
+        </button>
+      }
     >
       <div className="space-y-6">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">Payment Management</h1>
-            <p className="text-gray-600">Monitor and manage your payment transactions</p>
-          </div>
-          <div className="flex items-center space-x-3">
-            <button className="inline-flex items-center px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
-              <Download className="h-4 w-4 mr-2" />
-              Export
-            </button>
-          </div>
-        </div>
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -155,7 +215,7 @@ export default function SupplierPaymentsPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">Total Revenue</p>
-                <p className="text-2xl font-bold text-gray-900">${totalRevenue.toLocaleString()}</p>
+                <p className="text-2xl font-bold text-gray-900">₦{totalRevenue.toLocaleString()}</p>
                 <p className="text-sm text-green-600">+12% from last month</p>
               </div>
               <div className="p-3 bg-green-100 rounded-full">
@@ -181,7 +241,7 @@ export default function SupplierPaymentsPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">Transaction Fees</p>
-                <p className="text-2xl font-bold text-gray-900">${totalFees.toFixed(2)}</p>
+                <p className="text-2xl font-bold text-gray-900">₦{totalFees.toFixed(2)}</p>
                 <p className="text-sm text-red-600">Platform charges</p>
               </div>
               <div className="p-3 bg-red-100 rounded-full">
@@ -204,112 +264,22 @@ export default function SupplierPaymentsPage() {
           </div>
         </div>
 
-        {/* Filters */}
-        <div className="bg-white rounded-lg p-6 border border-gray-200">
-          <div className="flex flex-col sm:flex-row gap-4">
-            <div className="flex-1">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                <input
-                  type="text"
-                  placeholder="Search payments..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                />
-              </div>
-            </div>
-            <div className="flex items-center space-x-3">
-              <Filter className="h-4 w-4 text-gray-400" />
-              <select
-                value={filterStatus}
-                onChange={(e) => setFilterStatus(e.target.value)}
-                className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-              >
-                <option value="all">All Status</option>
-                <option value="completed">Completed</option>
-                <option value="pending">Pending</option>
-                <option value="processing">Processing</option>
-                <option value="failed">Failed</option>
-              </select>
-            </div>
-          </div>
-        </div>
+        {/* Search and Filters */}
+        <FilterBar
+          searchValue={searchTerm}
+          onSearchChange={setSearchTerm}
+          searchPlaceholder="Search payments by ID, order, or customer..."
+          filters={filterOptions}
+          activeFilters={activeFilters}
+          onFilterChange={handleFilterChange}
+        />
 
         {/* Payments Table */}
-        <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Payment ID
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Order
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Customer
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Amount
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Method
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Status
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Date
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Fee
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {filteredPayments.map((payment) => (
-                  <tr key={payment.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">{payment.id}</div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-blue-600 hover:text-blue-800 cursor-pointer">
-                        {payment.orderId}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">{payment.customer}</div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">
-                        ${payment.amount.toFixed(2)}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-600">{payment.method}</div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(payment.status)}`}>
-                        {getStatusIcon(payment.status)}
-                        <span className="ml-1 capitalize">{payment.status}</span>
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-600">{payment.date}</div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">
-                        ${payment.fee.toFixed(2)}
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
+        <DataTable
+          data={filteredPayments}
+          columns={paymentColumns}
+          actions={paymentActions}
+        />
 
         {/* Payment Methods Summary */}
         <div className="bg-white rounded-lg p-6 border border-gray-200">
@@ -370,6 +340,6 @@ export default function SupplierPaymentsPage() {
           </div>
         </div>
       </div>
-    </ModernDashboardLayout>
+    </ModernSubpageLayout>
   )
 }
