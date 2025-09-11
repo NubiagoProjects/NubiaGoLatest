@@ -1,7 +1,5 @@
 'use client';
 
-import SafariTestComponent from '@/components/debug/SafariTestComponent';
-
 export default function DebugPage() {
   return (
     <div className="min-h-screen bg-gray-100 p-4">
@@ -11,7 +9,10 @@ export default function DebugPage() {
           Comprehensive Safari iOS compatibility testing and debugging tools for NubiaGo.
         </p>
         
-        <SafariTestComponent />
+        <div className="bg-white rounded-lg shadow p-6 mb-8">
+          <h2 className="text-xl font-semibold mb-4">Debug Information</h2>
+          <p className="text-gray-600">Safari compatibility testing tools for NubiaGo platform.</p>
+        </div>
         
         <div className="mt-8 bg-white rounded-lg shadow p-6">
           <h2 className="text-xl font-semibold mb-4">How to Use Safari Web Inspector</h2>
