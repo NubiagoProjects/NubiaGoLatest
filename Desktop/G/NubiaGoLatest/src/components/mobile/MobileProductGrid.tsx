@@ -150,7 +150,7 @@ export default function MobileProductGrid({
                 <button
                   onClick={() => handleToggleWishlist(product)}
                   disabled={isLoading}
-                  className="w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center hover:bg-gray-50 transition-colors"
+                  className="w-11 h-11 bg-white rounded-full shadow-lg flex items-center justify-center hover:bg-gray-50 transition-colors touch-manipulation"
                 >
                   <Heart 
                     className={`h-5 w-5 ${
@@ -161,7 +161,7 @@ export default function MobileProductGrid({
                 
                 <button
                   onClick={() => handleQuickView(product)}
-                  className="w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center hover:bg-gray-50 transition-colors"
+                  className="w-11 h-11 bg-white rounded-full shadow-lg flex items-center justify-center hover:bg-gray-50 transition-colors touch-manipulation"
                 >
                   <Eye className="h-5 w-5 text-gray-600" />
                 </button>

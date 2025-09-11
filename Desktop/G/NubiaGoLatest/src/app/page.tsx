@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { Star, ShoppingCart, Heart, ArrowRight, Clock, Users, Award, ChevronLeft, ChevronRight, Search, Shirt, Laptop, Globe } from 'lucide-react'
 import { productService } from '@/lib/services/product.service'
 import { promotionService } from '@/lib/services/promotion.service'
@@ -14,6 +15,22 @@ import PullToRefresh from '@/components/mobile/PullToRefresh'
 // ============================================================================
 
 function HeroSection() {
+  const router = useRouter()
+  const [searchQuery, setSearchQuery] = useState('')
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (searchQuery.trim()) {
+      router.push(`/products?search=${encodeURIComponent(searchQuery.trim())}`)
+    }
+  }
+
+  const handleSearchButtonClick = () => {
+    if (searchQuery.trim()) {
+      router.push(`/products?search=${encodeURIComponent(searchQuery.trim())}`)
+    }
+  }
+
   return (
     <section className="bg-gradient-to-br from-primary-600 via-primary-700 to-primary-800 text-white overflow-hidden">
       <div className="w-full px-4 sm:px-6 lg:px-8 py-10">
@@ -53,14 +70,22 @@ function HeroSection() {
             </p>
 
             {/* Search Bar */}
-            <div className="relative max-w-xl mb-4">
-              <input type="text" 
-                     placeholder="e.g., smartphone, lipstick, washing machine..." 
-                     className="w-full px-4 py-3 pr-12 rounded-full text-neutral-900 placeholder-neutral-500 focus:outline-none focus:ring-4 focus:ring-white/20 shadow-lg" />
-              <button className="absolute right-1 top-1 bg-primary-600 hover:bg-primary-700 text-white p-2 rounded-full transition-colors">
+            <form onSubmit={handleSearch} className="relative max-w-xl mb-4">
+              <input 
+                type="text" 
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="e.g., smartphone, lipstick, washing machine..." 
+                className="w-full px-4 py-3 pr-12 rounded-full text-neutral-900 placeholder-neutral-500 focus:outline-none focus:ring-4 focus:ring-white/20 shadow-lg" 
+              />
+              <button 
+                type="button"
+                onClick={handleSearchButtonClick}
+                className="absolute right-1 top-1 bg-primary-600 hover:bg-primary-700 text-white p-2 rounded-full transition-colors"
+              >
                 <Search className="h-4 w-4" />
               </button>
-            </div>
+            </form>
 
             {/* Stats */}
             <div className="flex flex-wrap gap-4">

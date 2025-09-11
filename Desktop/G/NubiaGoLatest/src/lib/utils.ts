@@ -53,7 +53,7 @@ export function throttle<T extends (...args: any[]) => any>(
 }
 
 // Image utilities
-export function getImageFallback(imageUrl: string, fallbackUrl: string = '/fallback-product.jpg'): string {
+export function getImageFallback(imageUrl: string | undefined, fallbackUrl: string = '/fallback-product.jpg'): string {
   return imageUrl || fallbackUrl
 }
 

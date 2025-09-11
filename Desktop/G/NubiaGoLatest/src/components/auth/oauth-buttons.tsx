@@ -86,8 +86,8 @@ export function OAuthButtons({
   disabled = false,
   className = '' 
 }: OAuthButtonsProps) {
-  const [loadingProvider, setLoadingProvider] = useState<'google' | 'facebook' | null>(null)
-  const [retryCount, setRetryCount] = useState<{ google: number; facebook: number }>({ google: 0, facebook: 0 })
+  const [loadingProvider, setLoadingProvider] = useState<'google' | null>(null)
+  const [retryCount, setRetryCount] = useState<{ google: number }>({ google: 0 })
   const [lastError, setLastError] = useState<string | null>(null)
   const [lastErrorCode, setLastErrorCode] = useState<string | null>(null)
   const { signInWithGoogle } = useFirebaseAuth()
@@ -131,45 +131,11 @@ export function OAuthButtons({
     }
   }
 
-  const handleFacebookAuth = async () => {
-    if (disabled || loadingProvider) return
-    
-    setLoadingProvider('facebook')
-    setLastError(null)
-    setLastErrorCode(null)
-    
-    try {
-      // Facebook OAuth is not implemented yet - show user-friendly message
-      const errorMessage = 'Facebook sign-in is temporarily unavailable. Please use Google sign-in or email/password instead.'
-      setLastError(errorMessage)
-      onError?.(errorMessage)
-    } catch (error: any) {
-      const errorMessage = error.message || 'Facebook sign-in failed'
-      setLastError(errorMessage)
-      setLastErrorCode(error.code || null)
-      
-      // Check if it's a popup-related error and we haven't exceeded retry limit
-      if ((error.code === 'auth/popup-closed-by-user' || 
-           error.code === 'auth/popup-blocked' || 
-           error.code === 'auth/cancelled-popup-request') && 
-          retryCount.facebook < MAX_RETRIES) {
-        // Increment retry count
-        setRetryCount(prev => ({ ...prev, facebook: prev.facebook + 1 }))
-        // Don't show error immediately, let user retry
-        setLastError(null)
-        setLastErrorCode(null)
-      } else {
-        onError?.(errorMessage)
-      }
-    } finally {
-      setLoadingProvider(null)
-    }
-  }
 
   const isLoading = loadingProvider !== null || disabled
 
   // Helper function to get retry message
-  const getRetryMessage = (provider: 'google' | 'facebook') => {
+  const getRetryMessage = (provider: 'google') => {
     const count = retryCount[provider]
     if (count === 0) return null
     if (count === 1) return 'Try again'
@@ -226,37 +192,6 @@ export function OAuthButtons({
         )}
       </div>
 
-      {/* Facebook Button */}
-      <div className="space-y-2">
-        <button
-          type="button"
-          onClick={handleFacebookAuth}
-          disabled={isLoading}
-          className="w-full inline-flex items-center justify-center py-3 px-4 border border-gray-300 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-        >
-          {loadingProvider === 'facebook' ? (
-            <div className="w-5 h-5 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin" />
-          ) : (
-            <svg className="w-5 h-5" fill="#1877F2" viewBox="0 0 24 24">
-              <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-            </svg>
-          )}
-          {loadingProvider !== 'facebook' && (
-            <span className="ml-2">
-              {mode === 'login' ? 'Sign in' : 'Sign up'} with Facebook
-            </span>
-          )}
-        </button>
-        
-        {/* Retry message for Facebook */}
-        {retryCount.facebook > 0 && retryCount.facebook <= MAX_RETRIES && (
-          <div className="text-center">
-            <p className="text-xs text-amber-600">
-              {getRetryMessage('facebook')} • Popup closed unexpectedly
-            </p>
-          </div>
-        )}
-      </div>
 
       {/* Popup error guidance */}
       {lastErrorCode && (
@@ -399,109 +334,3 @@ export function GoogleAuthButton({
   )
 }
 
-export function FacebookAuthButton({ 
-  mode, 
-  onError, 
-  onSuccess, 
-  disabled = false,
-  className = '',
-  fullWidth = true 
-}: OAuthButtonsProps & { fullWidth?: boolean }) {
-  const [loading, setLoading] = useState(false)
-  const [retryCount, setRetryCount] = useState(0)
-  const [lastError, setLastError] = useState<string | null>(null)
-  const [lastErrorCode, setLastErrorCode] = useState<string | null>(null)
-  const { signIn } = useFirebaseAuth()
-  const router = useRouter()
-
-  const MAX_RETRIES = 2
-
-  const handleClick = async () => {
-    if (disabled || loading) return
-    
-    setLoading(true)
-    setLastError(null)
-    setLastErrorCode(null)
-    
-    try {
-      // Facebook OAuth is not implemented yet - show user-friendly message
-      const errorMessage = 'Facebook sign-in is temporarily unavailable. Please use Google sign-in or email/password instead.'
-      setLastError(errorMessage)
-      throw new Error(errorMessage)
-    } catch (error: any) {
-      const errorMessage = error.message || 'Facebook sign-in failed'
-      setLastError(errorMessage)
-      setLastErrorCode(error.code || null)
-      
-      // Check if it's a popup-related error and we haven't exceeded retry limit
-      if ((error.code === 'auth/popup-closed-by-user' || 
-           error.code === 'auth/popup-blocked' || 
-           error.code === 'auth/cancelled-popup-request') && 
-          retryCount < MAX_RETRIES) {
-        // Increment retry count
-        setRetryCount(prev => prev + 1)
-        // Don't show error immediately, let user retry
-        setLastError(null)
-        setLastErrorCode(null)
-      } else {
-        onError?.(errorMessage)
-      }
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const getRetryMessage = () => {
-    if (retryCount === 0) return null
-    if (retryCount === 1) return 'Try again'
-    if (retryCount === 2) return 'Last attempt'
-    return null
-  }
-
-  return (
-    <div className="space-y-2">
-      <button
-        type="button"
-        onClick={handleClick}
-        disabled={loading || disabled}
-        className={`${fullWidth ? 'w-full' : ''} inline-flex items-center justify-center py-3 px-4 border border-gray-300 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors ${className}`}
-      >
-        {loading ? (
-          <div className="w-5 h-5 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin" />
-        ) : (
-          <svg className="w-5 h-5" fill="#1877F2" viewBox="0 0 24 24">
-            <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-          </svg>
-        )}
-        {!loading && (
-          <span className="ml-2">
-            {mode === 'login' ? 'Sign in' : 'Sign up'} with Facebook
-          </span>
-        )}
-      </button>
-      
-      {/* Retry message */}
-      {retryCount > 0 && retryCount <= MAX_RETRIES && (
-        <div className="text-center">
-          <p className="text-xs text-amber-600">
-            {getRetryMessage()} • Popup closed unexpectedly
-          </p>
-        </div>
-      )}
-      
-      {/* Popup error guidance */}
-      {lastErrorCode && (
-        <PopupErrorGuidance errorCode={lastErrorCode} />
-      )}
-      
-      {/* Error message */}
-      {lastError && (
-        <div className="text-center">
-          <p className="text-xs text-red-600">
-            {lastError}
-          </p>
-        </div>
-      )}
-    </div>
-  )
-}

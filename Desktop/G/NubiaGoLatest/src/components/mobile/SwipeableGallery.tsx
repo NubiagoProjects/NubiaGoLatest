@@ -208,7 +208,7 @@ export default function SwipeableGallery({
           <>
             <button
               onClick={previousImage}
-              className="absolute left-2 top-1/2 transform -translate-y-1/2 w-10 h-10 bg-white bg-opacity-80 hover:bg-opacity-100 rounded-full flex items-center justify-center shadow-lg transition-all duration-200 z-10"
+              className="absolute left-2 top-1/2 transform -translate-y-1/2 w-11 h-11 bg-white bg-opacity-80 hover:bg-opacity-100 rounded-full flex items-center justify-center shadow-lg transition-all duration-200 z-10 touch-manipulation"
               aria-label="Previous image"
             >
               <ChevronLeftIcon className="w-6 h-6 text-gray-700" />
@@ -216,7 +216,7 @@ export default function SwipeableGallery({
             
             <button
               onClick={nextImage}
-              className="absolute right-2 top-1/2 transform -translate-y-1/2 w-10 h-10 bg-white bg-opacity-80 hover:bg-opacity-100 rounded-full flex items-center justify-center shadow-lg transition-all duration-200 z-10"
+              className="absolute right-2 top-1/2 transform -translate-y-1/2 w-11 h-11 bg-white bg-opacity-80 hover:bg-opacity-100 rounded-full flex items-center justify-center shadow-lg transition-all duration-200 z-10 touch-manipulation"
               aria-label="Next image"
             >
               <ChevronRightIcon className="w-6 h-6 text-gray-700" />

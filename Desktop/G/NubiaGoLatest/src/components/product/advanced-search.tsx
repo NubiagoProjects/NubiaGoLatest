@@ -77,7 +77,7 @@ const ProductCard = React.memo(function ProductCard({ product, viewMode }: { pro
     return (
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 flex space-x-4">
         <EnhancedImage
-          src={product.imageUrl}
+          src={product.images?.[0] || '/fallback-product.jpg'}
           alt={product.name}
           width={96}
           height={96}

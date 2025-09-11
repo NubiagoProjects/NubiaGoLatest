@@ -128,7 +128,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         <div className="absolute top-3 right-3 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
           <button
             onClick={handleWishlistToggle}
-            className="w-10 h-10 bg-white/95 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg hover:bg-white transition-colors"
+            className="w-11 h-11 bg-white/95 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg hover:bg-white transition-colors touch-manipulation"
           >
             <Heart 
               className={`h-5 w-5 ${isWishlisted ? 'text-red-500 fill-current' : 'text-neutral-600'}`} 

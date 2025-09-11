@@ -68,7 +68,7 @@ export function generateProductMetadata(product: {
   description: string
   price: number
   category: string
-  imageUrl: string
+  images: string[]
   id: string
 }): Metadata {
   return {
@@ -82,7 +82,7 @@ export function generateProductMetadata(product: {
       url: `https://nubiago.com/products/${product.id}`,
       images: [
         {
-          url: product.imageUrl,
+          url: product.images?.[0] || '/fallback-product.jpg',
           width: 800,
           height: 600,
           alt: product.name,
@@ -93,7 +93,7 @@ export function generateProductMetadata(product: {
       card: 'summary_large_image',
       title: product.name,
       description: product.description,
-      images: [product.imageUrl],
+      images: [product.images?.[0] || '/fallback-product.jpg'],
     },
     alternates: {
       canonical: `/products/${product.id}`,
@@ -105,7 +105,7 @@ export function generateProductMetadata(product: {
 export function generateCategoryMetadata(category: {
   name: string
   description: string
-  imageUrl?: string
+  images?: string[]
 }): Metadata {
   return {
     title: `${category.name} - Shop Online`,
@@ -116,9 +116,9 @@ export function generateCategoryMetadata(category: {
       description: category.description,
       type: 'website',
       url: `https://nubiago.com/products?category=${encodeURIComponent(category.name)}`,
-      images: category.imageUrl ? [
+      images: category.images?.[0] ? [
         {
-          url: category.imageUrl,
+          url: category.images[0],
           width: 1200,
           height: 630,
           alt: category.name,
@@ -136,7 +136,7 @@ export function generatePageMetadata(page: {
   title: string
   description: string
   path: string
-  imageUrl?: string
+  images?: string[]
 }): Metadata {
   return {
     title: page.title,
@@ -145,9 +145,9 @@ export function generatePageMetadata(page: {
       title: page.title,
       description: page.description,
       url: `https://nubiago.com${page.path}`,
-      images: page.imageUrl ? [
+      images: page.images?.[0] ? [
         {
-          url: page.imageUrl,
+          url: page.images[0],
           width: 1200,
           height: 630,
           alt: page.title,
@@ -167,7 +167,7 @@ export function generateProductStructuredData(product: {
   description: string
   price: number
   originalPrice?: number
-  imageUrl: string
+  images: string[]
   category: string
   brand?: string
   rating?: number
@@ -179,7 +179,7 @@ export function generateProductStructuredData(product: {
     '@type': 'Product',
     name: product.name,
     description: product.description,
-    image: product.imageUrl,
+    image: product.images?.[0] || '/fallback-product.jpg',
     brand: product.brand ? {
       '@type': 'Brand',
       name: product.brand,
@@ -260,13 +260,13 @@ export function generateBreadcrumbStructuredData(breadcrumbs: Array<{
 // SEO utility functions
 export const seoUtils = {
   // Generate meta tags for social sharing
-  generateSocialMeta: (title: string, description: string, imageUrl?: string) => ({
+  generateSocialMeta: (title: string, description: string, images?: string[]) => ({
     'og:title': title,
     'og:description': description,
-    'og:image': imageUrl,
+    'og:image': images?.[0] || '/fallback-product.jpg',
     'twitter:title': title,
     'twitter:description': description,
-    'twitter:image': imageUrl,
+    'twitter:image': images?.[0] || '/fallback-product.jpg',
   }),
 
   // Generate canonical URL

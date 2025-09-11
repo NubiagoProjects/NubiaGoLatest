@@ -379,7 +379,7 @@ export function ProductShare({ product }: { product: any }) {
     title: product.name,
     description: product.description || `Check out this amazing ${product.name} on NubiaGo!`,
     url: `${window.location.origin}/products/${product.id}`,
-            image: product.imageUrl,
+            image: product.images?.[0] || '/fallback-product.jpg',
     hashtags: ['NubiaGo', 'Shopping', 'Ecommerce']
   }
 

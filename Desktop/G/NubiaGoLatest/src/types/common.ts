@@ -86,7 +86,6 @@ export interface Product {
   currency: string
   category: string
   images: string[]
-  imageUrl: string
   tags: string[]
   specifications: Record<string, string>
   inventory: number
