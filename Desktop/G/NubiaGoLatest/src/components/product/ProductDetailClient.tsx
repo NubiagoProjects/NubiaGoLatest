@@ -6,6 +6,7 @@ import { ArrowLeft, Star, Heart, ShoppingCart, Share2, Eye, Truck, Shield, Check
 import { Product } from '@/types'
 import SwipeableGallery from '@/components/mobile/SwipeableGallery'
 import { useCartStore } from '@/store/cart'
+import { AIRecommendations, SimilarProducts } from '@/components/product/ai-recommendations'
 
 interface Review {
   id: string
@@ -282,6 +283,25 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
             </div>
           </div>
         </div>
+
+        {/* Similar Products */}
+        <SimilarProducts productId={product.id} className="mt-8" />
+
+        {/* AI Recommendations */}
+        <AIRecommendations
+          context={{
+            currentProduct: product,
+            category: product.category,
+            priceRange: {
+              min: Math.max(0, product.price * 0.7),
+              max: product.price * 1.5
+            }
+          }}
+          title="You might also like"
+          limit={6}
+          showReasons={true}
+          className="mt-8"
+        />
 
         {/* Reviews */}
         <div className="bg-white border border-gray-200 rounded-lg p-6 mt-6">

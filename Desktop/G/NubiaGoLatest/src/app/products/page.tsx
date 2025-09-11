@@ -12,6 +12,7 @@ import { OptimizedProductSearch } from '@/components/optimized/OptimizedProductS
 import { EnhancedErrorBoundary } from '@/components/ui/enhanced-error-boundary'
 import { AdaptiveSkeleton } from '@/components/ui/adaptive-loading-skeleton'
 import { useNetworkAwareOptimization } from '@/hooks/useNetworkAwareOptimization'
+import { AIRecommendations } from '@/components/product/ai-recommendations'
 
 const CATEGORIES = [
   'All Categories',
@@ -271,6 +272,37 @@ export default function ProductsPage() {
             columns={viewMode === 'grid' ? 2 : 2}
             className="mt-6"
           />
+
+          {/* Category-based AI Recommendations */}
+          {products.length > 0 && (
+            <div className="mt-12">
+              <div className="bg-white rounded-lg border border-gray-200 p-6">
+                <div className="mb-6">
+                  <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                    {selectedCategory === 'All Categories' 
+                      ? 'Recommended for You' 
+                      : `More in ${selectedCategory}`
+                    }
+                  </h2>
+                  <p className="text-gray-600">
+                    {selectedCategory === 'All Categories'
+                      ? 'Discover products tailored to your preferences'
+                      : `Explore similar products in the ${selectedCategory} category`
+                    }
+                  </p>
+                </div>
+                
+                <AIRecommendations
+                  context={{
+                    category: selectedCategory === 'All Categories' ? undefined : selectedCategory
+                  }}
+                  limit={6}
+                  title=""
+                  className="bg-transparent"
+                />
+              </div>
+            </div>
+          )}
 
           {products.length === 0 && !isLoading && (
             <div className="text-center py-12">

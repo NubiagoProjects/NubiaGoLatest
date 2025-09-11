@@ -9,6 +9,7 @@ import { CartService } from '@/lib/services/cart.service'
 import { useAuth } from '@/hooks/useAuth'
 import { Product } from '@/types'
 import ModernSubpageLayout from '@/components/dashboard/ModernSubpageLayout'
+import { AIRecommendations } from '@/components/product/ai-recommendations'
 
 interface WishlistItem {
   id: string
@@ -322,6 +323,32 @@ export default function WishlistPage() {
                 </div>
               </div>
             ))}
+        </div>
+      )}
+
+      {/* Wishlist-based AI Recommendations */}
+      {wishlistItems.length > 0 && (
+        <div className="mt-8">
+          <div className="bg-white rounded-lg shadow p-6">
+            <div className="mb-6">
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                You Might Also Like
+              </h2>
+              <p className="text-gray-600">
+                Based on your wishlist preferences, here are some products you might enjoy
+              </p>
+            </div>
+            
+            <AIRecommendations
+              context={{
+                userId: user?.uid,
+                category: wishlistItems.length > 0 ? wishlistItems[0].product.name.split(' ')[0] : undefined
+              }}
+              limit={6}
+              title=""
+              className="bg-transparent"
+            />
+          </div>
         </div>
       )}
     </ModernSubpageLayout>

@@ -3,8 +3,9 @@
 import React, { useState, useEffect } from 'react'
 import { Product } from '@/types'
 import { aiRecommendationService, RecommendationContext } from '@/lib/services/ai-recommendation.service'
+import { recommendationAnalyticsService } from '@/lib/services/recommendation-analytics.service'
 import { useAuth } from '@/hooks/useAuth'
-import { ProductCard } from './ProductCard'
+import { ProductCard } from '@/components/ui/product-card'
 import { Loader2, Sparkles, TrendingUp, Heart, Eye } from 'lucide-react'
 
 interface AIRecommendationsProps {
@@ -32,6 +33,21 @@ export function AIRecommendations({
   useEffect(() => {
     loadRecommendations()
   }, [user?.id, context, limit])
+
+  const handleProductClick = (product: Product) => {
+    // Track recommendation click
+    recommendationAnalyticsService.trackRecommendationClick(
+      product.id,
+      `rec_${Date.now()}`,
+      algorithm,
+      products.findIndex(p => p.id === product.id),
+      {
+        page: context?.currentProduct ? 'product_detail' : 'homepage',
+        category: context?.category
+      },
+      user?.id
+    )
+  }
 
   const loadRecommendations = async () => {
     try {
@@ -169,7 +185,20 @@ export function AIRecommendations({
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {products.map((product) => (
             <div key={product.id} className="relative">
-              <ProductCard product={product} />
+              <ProductCard 
+                id={product.id}
+                name={product.name}
+                price={`$${product.price}`}
+                originalPrice={product.originalPrice ? `$${product.originalPrice}` : undefined}
+                image={product.images?.[0] || product.image || '/placeholder-product.jpg'}
+                rating={product.rating}
+                reviewCount={product.reviewCount}
+                category={product.category}
+                inStock={product.inStock !== false}
+                badge={product.featured ? 'Featured' : undefined}
+                onAddToCart={() => handleProductClick(product)}
+                onAddToWishlist={() => handleProductClick(product)}
+              />
               
               {/* Recommendation Reasons */}
               {showReasons && reasons[product.id] && reasons[product.id].length > 0 && (
@@ -232,6 +261,20 @@ export function SimilarProducts({ productId, className }: { productId: string; c
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
 
+  const handleProductClick = (product: Product) => {
+    // Track similar product click
+    recommendationAnalyticsService.trackRecommendationClick(
+      product.id,
+      `similar_${Date.now()}`,
+      'content_similarity',
+      products.findIndex(p => p.id === product.id),
+      {
+        page: 'product_detail',
+        currentProduct: productId
+      }
+    )
+  }
+
   useEffect(() => {
     const loadSimilar = async () => {
       try {
@@ -269,7 +312,21 @@ export function SimilarProducts({ productId, className }: { productId: string; c
       </h3>
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {products.map((product) => (
-          <ProductCard key={product.id} product={product} />
+          <ProductCard 
+            key={product.id}
+            id={product.id}
+            name={product.name}
+            price={`$${product.price}`}
+            originalPrice={product.originalPrice ? `$${product.originalPrice}` : undefined}
+            image={product.images?.[0] || product.image || '/placeholder-product.jpg'}
+            rating={product.rating}
+            reviewCount={product.reviewCount}
+            category={product.category}
+            inStock={product.inStock !== false}
+            badge={product.featured ? 'Featured' : undefined}
+            onAddToCart={() => handleProductClick(product)}
+            onAddToWishlist={() => handleProductClick(product)}
+          />
         ))}
       </div>
     </div>

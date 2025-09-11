@@ -9,6 +9,7 @@ import { productService } from '@/lib/services/product.service'
 import { promotionService } from '@/lib/services/promotion.service'
 import { Product, Deal } from '@/types'
 import PullToRefresh from '@/components/mobile/PullToRefresh'
+import { AIRecommendations, TrendingProducts } from '@/components/product/ai-recommendations'
 
 // ============================================================================
 // HERO SECTION
@@ -799,6 +800,70 @@ function FeaturedDealsSection() {
 }
 
 // ============================================================================
+// AI RECOMMENDATIONS SECTION
+// ============================================================================
+
+function AIRecommendationsSection() {
+  return (
+    <section className="py-16 bg-gradient-to-br from-slate-50 via-white to-slate-50">
+      <div className="w-full px-4 sm:px-6 lg:px-8">
+        <div className="text-center mb-12">
+          <div className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-primary-600 to-secondary-600 text-white text-sm font-semibold rounded-full mb-4 shadow-lg">
+            <span className="w-2 h-2 bg-white rounded-full mr-2 animate-pulse"></span>
+            Personalized for You
+          </div>
+          <h2 className="text-4xl lg:text-5xl font-bold bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 bg-clip-text text-transparent mb-4">
+            Recommended Just for You
+          </h2>
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">
+            Discover products tailored to your preferences with our AI-powered recommendation engine
+          </p>
+        </div>
+
+        <div className="max-w-7xl mx-auto">
+          <AIRecommendations 
+            limit={8}
+            title=""
+            className="bg-transparent"
+          />
+        </div>
+      </div>
+    </section>
+  )
+}
+
+// ============================================================================
+// TRENDING PRODUCTS SECTION
+// ============================================================================
+
+function TrendingProductsSection() {
+  return (
+    <section className="py-16 bg-white">
+      <div className="w-full px-4 sm:px-6 lg:px-8">
+        <div className="text-center mb-12">
+          <div className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-yellow-500 to-orange-500 text-white text-sm font-semibold rounded-full mb-4 shadow-lg">
+            <span className="w-2 h-2 bg-white rounded-full mr-2 animate-pulse"></span>
+            What's Hot
+          </div>
+          <h2 className="text-4xl lg:text-5xl font-bold bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 bg-clip-text text-transparent mb-4">
+            Trending Now
+          </h2>
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">
+            See what's popular and trending among our community of shoppers
+          </p>
+        </div>
+
+        <div className="max-w-7xl mx-auto">
+          <TrendingProducts 
+            className="bg-transparent"
+          />
+        </div>
+      </div>
+    </section>
+  )
+}
+
+// ============================================================================
 // NEWSLETTER SECTION
 // ============================================================================
 
@@ -914,9 +979,11 @@ export default function HomePage() {
         <PullToRefresh onRefresh={() => Promise.resolve(window.location.reload())}>
           <HeroSection />
           <NewArrivalsSection />
+          <AIRecommendationsSection />
           <ShopByCategoriesSection />
           <FashionCollectionSection />
           <ShopOurOffersSection />
+          <TrendingProductsSection />
           <TestimonialsSection />
           <FeaturedDealsSection />
           <NewsletterSection />

@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react'
 import Link from 'next/link'
 import { ArrowLeft, ShoppingBag, Trash2, Plus, Minus, Shield, Truck, CreditCard, Star, Clock, Tag, AlertTriangle } from 'lucide-react'
 import ShoppingCart from '@/components/cart/shopping-cart'
+import Recommendations from '@/components/cart/recommendations'
 import { CartService } from '@/lib/services/cart.service'
 import { useAuth } from '@/hooks/useAuth'
 import { Product } from '@/types'
@@ -285,7 +286,7 @@ export default function CartPage() {
         {/* Two-Column Layout */}
         <div className="grid lg:grid-cols-3 gap-6">
           {/* Main Cart Content */}
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-2 space-y-6">
             <ShoppingCart
               items={cartItems}
               onUpdateQuantity={handleUpdateQuantity}
@@ -295,6 +296,15 @@ export default function CartPage() {
               onAddToCart={handleAddToCart}
               onAddToWishlist={handleAddToWishlist}
             />
+            
+            {/* Cart-based Recommendations */}
+            {cartItems.length > 0 && (
+              <Recommendations
+                cartItems={cartItems}
+                onAddToCart={handleAddToCart}
+                onAddToWishlist={handleAddToWishlist}
+              />
+            )}
           </div>
 
           {/* Sidebar - Order Summary & Quick Actions */}
