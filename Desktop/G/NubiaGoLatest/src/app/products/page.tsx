@@ -7,8 +7,11 @@ import { ArrowLeft, Grid3X3, List, Filter, Search, ChevronDown } from 'lucide-re
 import { productService } from '@/lib/services/product.service'
 import { useInfiniteScroll } from '@/hooks/useInfiniteScroll'
 import { Product } from '@/types'
-import PullToRefresh from '@/components/mobile/PullToRefresh'
-import { ProductCard } from '@/components/ui/product-card'
+import { OptimizedProductGrid } from '@/components/optimized/OptimizedProductGrid'
+import { OptimizedProductSearch } from '@/components/optimized/OptimizedProductSearch'
+import { EnhancedErrorBoundary } from '@/components/ui/enhanced-error-boundary'
+import { AdaptiveSkeleton } from '@/components/ui/adaptive-loading-skeleton'
+import { useNetworkAwareOptimization } from '@/hooks/useNetworkAwareOptimization'
 
 const CATEGORIES = [
   'All Categories',
@@ -123,20 +126,58 @@ export default function ProductsPage() {
     console.log('Toggle wishlist for product:', product.id)
   }
 
+  const { shouldEnableFeature } = useNetworkAwareOptimization()
+
+  // Enhanced search function for OptimizedProductSearch
+  const handleProductSearch = useCallback(async (query: string, filters?: any) => {
+    try {
+      const result = await productService.searchProducts(query, filters)
+      return result || []
+    } catch (error) {
+      console.error('Search error:', error)
+      return []
+    }
+  }, [])
+
+  const handleProductSelect = useCallback((product: Product) => {
+    router.push(`/products/${product.id}`)
+  }, [router])
+
+  const handleAddToCart = useCallback((product: Product) => {
+    console.log('Add to cart:', product.id)
+  }, [])
+
+  const handleAddToWishlist = useCallback((product: Product) => {
+    console.log('Add to wishlist:', product.id)
+  }, [])
+
+  const handleShare = useCallback((product: Product) => {
+    if (navigator.share) {
+      navigator.share({
+        title: product.name,
+        text: `Check out ${product.name}`,
+        url: `/products/${product.id}`
+      })
+    }
+  }, [])
+
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-8 h-8 border-2 border-gray-300 border-t-blue-600 rounded-full animate-spin mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading products...</p>
+      <EnhancedErrorBoundary>
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+          <AdaptiveSkeleton 
+            variant="card" 
+            count={6} 
+            animate={shouldEnableFeature('animations')}
+          />
         </div>
-      </div>
+      </EnhancedErrorBoundary>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <PullToRefresh onRefresh={() => loadProducts(searchParams.get('category'), searchParams.get('subcategory'))}>
+    <EnhancedErrorBoundary>
+      <div className="min-h-screen bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="bg-white border border-gray-200 rounded-lg p-4 mb-6">
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
@@ -210,45 +251,28 @@ export default function ProductsPage() {
             </div>
           </div>
 
-          <div className="sticky top-0 z-20 bg-white border border-gray-200 rounded-lg p-4 mb-6 shadow-sm">
-            <form onSubmit={handleSearch} className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search products..."
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-lg"
-              />
-              <button
-                type="submit"
-                className="absolute right-2 top-1/2 transform -translate-y-1/2 px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors"
-              >
-                Search
-              </button>
-            </form>
-          </div>
+          {/* Enhanced Search Component */}
+          <OptimizedProductSearch
+            onSearch={handleProductSearch}
+            onProductSelect={handleProductSelect}
+            placeholder="Search products..."
+            showFilters={true}
+            initialQuery={searchQuery}
+          />
 
-          {products.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {products.map((product) => (
-                <ProductCard
-                  key={product.id}
-                  id={product.id}
-                  name={product.name}
-                  price={`$${product.price.toFixed(2)}`}
-                  originalPrice={product.originalPrice ? `$${product.originalPrice.toFixed(2)}` : undefined}
-                  image={product.images?.[0] || '/images/placeholder-product.png'}
-                  category={product.category}
-                  rating={product.rating}
-                  reviewCount={product.reviewCount}
-                  badge={product.tags?.includes('new') ? 'New' : product.tags?.includes('sale') ? 'Sale' : undefined}
-                  inStock={product.inStock}
-                  onAddToWishlist={() => handleToggleWishlist(product)}
-                />
-              ))}
-            </div>
-          ) : (
+          {/* Optimized Product Grid */}
+          <OptimizedProductGrid
+            products={products}
+            loading={isLoading}
+            onProductClick={handleProductSelect}
+            onAddToCart={handleAddToCart}
+            onAddToWishlist={handleAddToWishlist}
+            onShare={handleShare}
+            columns={viewMode === 'grid' ? 2 : 2}
+            className="mt-6"
+          />
+
+          {products.length === 0 && !isLoading && (
             <div className="text-center py-12">
               <div className="bg-white border border-gray-200 rounded-lg p-8">
                 <Search className="h-12 w-12 text-gray-400 mx-auto mb-4" />
@@ -272,7 +296,7 @@ export default function ProductsPage() {
             </div>
           )}
         </div>
-      </PullToRefresh>
-    </div>
+      </div>
+    </EnhancedErrorBoundary>
   )
 }

@@ -2,9 +2,11 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
 import './safari-fixes.css'
-import '../styles/mobile-dashboard.css'
-import ClientLayout from './client-layout'
+import { PerformanceProvider } from '@/components/providers/performance-provider'
+import { ToastProvider } from '@/components/ui/toast'
+import { EnhancedErrorBoundary } from '@/components/ui/enhanced-error-boundary'
 import SafariInitializer from '@/components/SafariInitializer'
+import ClientLayout from './client-layout'
 
 // Optimize font loading
 const inter = Inter({
@@ -136,9 +138,15 @@ export default function RootLayout({
       </head>
       <body className={inter.className}>
         <SafariInitializer />
-        <ClientLayout>
-          {children}
-        </ClientLayout>
+        <PerformanceProvider enableAutoOptimization={true}>
+          <EnhancedErrorBoundary>
+            <ToastProvider>
+              <ClientLayout>
+                {children}
+              </ClientLayout>
+            </ToastProvider>
+          </EnhancedErrorBoundary>
+        </PerformanceProvider>
       </body>
     </html>
   )
